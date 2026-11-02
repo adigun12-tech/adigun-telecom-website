@@ -213,6 +213,53 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      
+<section className="section portfolio-section" id="portfolio">
+  <div className="container">
+    <div className="portfolio-heading">
+      <div>
+        <span className="section-label">SELECTED PROJECT</span>
+        <h2 className="section-title">
+          Technology put into practice.
+        </h2>
+      </div>
+      <p className="section-description">
+        Exploring practical digital solutions through real-world
+        projects and continuous innovation.
+      </p>
+    </div>
+
+    <article className="portfolio-card">
+      <div className="portfolio-art">
+        <div className="portfolio-screen">
+          <div className="portfolio-screen-top">
+            <span>TRUST FOUNDATION SCHOOL</span>
+            <span>EDUCATION PLATFORM</span>
+          </div>
+          <div className="portfolio-screen-body">
+            <GraduationCap size={48} />
+            <strong>Digital School Management</strong>
+            <span>Website • School Portal • Digital Administration</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="portfolio-info">
+        <span className="portfolio-category">EDUCATION TECHNOLOGY</span>
+        <h3>Trust Foundation School</h3>
+        <p>
+          A digital education project bringing together a school
+          website and school management portal to support
+          administration, academic records and communication.
+        </p>
+        <span className="portfolio-status">
+          Featured education technology project
+        </span>
+      </div>
+    </article>
+  </div>
+</section>
+      
 
       <section className="section product-section" id="products">
         <div className="container product-grid">
