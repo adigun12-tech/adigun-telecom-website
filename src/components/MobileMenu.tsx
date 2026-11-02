@@ -5,13 +5,16 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ArrowRight } from "lucide-react";
 
+
 const links = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Products", href: "#products" },
+  { label: "Portfolio", href: "#portfolio" },
   { label: "Contact", href: "#contact" },
 ];
+
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
