@@ -23,6 +23,46 @@ function createSlug(value: string) {
     .slice(0, 100);
 }
 
+function cleanGalleryImages(value: unknown) {
+  if (!Array.isArray(value)) return null;
+
+  return value
+    .filter((item) => typeof item === "string")
+    .map((item) => cleanText(item, 2000))
+    .filter(Boolean)
+    .slice(0, 30)
+    .map((image_url, index) => ({
+      image_url,
+      display_order: index,
+    }));
+}
+
+async function saveGalleryImages(projectId: string, images: unknown) {
+  const galleryImages = cleanGalleryImages(images);
+
+  if (galleryImages === null) return;
+
+  const { error: deleteError } = await supabaseAdmin
+    .from("portfolio_project_images")
+    .delete()
+    .eq("project_id", projectId);
+
+  if (deleteError) throw deleteError;
+
+  if (galleryImages.length === 0) return;
+
+  const { error: insertError } = await supabaseAdmin
+    .from("portfolio_project_images")
+    .insert(
+      galleryImages.map((image) => ({
+        ...image,
+        project_id: projectId,
+      }))
+    );
+
+  if (insertError) throw insertError;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const admin = await verifyAdmin(request);
@@ -36,7 +76,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from("portfolio_projects")
-      .select("*")
+      .select("*, portfolio_project_images(*)")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: false });
 
@@ -99,7 +139,8 @@ export async function POST(request: NextRequest) {
       .insert({
         title,
         slug,
-        short_description: cleanText(body.short_description, 500) || null,
+        short_description:
+          cleanText(body.short_description, 500) || null,
         description: cleanText(body.description, 20000) || null,
         category: cleanText(body.category, 100) || null,
         technologies,
@@ -123,6 +164,10 @@ export async function POST(request: NextRequest) {
       }
 
       throw error;
+    }
+
+    if (Array.isArray(body.gallery_images)) {
+      await saveGalleryImages(data.id, body.gallery_images);
     }
 
     return NextResponse.json({ project: data }, { status: 201 });
@@ -161,23 +206,27 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof body.title === "string") {
       const title = cleanText(body.title, 200);
+
       if (!title) {
         return NextResponse.json(
           { error: "Project title cannot be empty." },
           { status: 400 }
         );
       }
+
       updates.title = title;
     }
 
     if (typeof body.slug === "string") {
       const slug = createSlug(body.slug);
+
       if (!slug) {
         return NextResponse.json(
           { error: "A valid project slug is required." },
           { status: 400 }
         );
       }
+
       updates.slug = slug;
     }
 
@@ -230,32 +279,37 @@ export async function PATCH(request: NextRequest) {
       updates.display_order = body.display_order;
     }
 
-    if (Object.keys(updates).length === 0) {
+    const hasGalleryUpdate = Array.isArray(body.gallery_images);
+
+    if (Object.keys(updates).length === 0 && !hasGalleryUpdate) {
       return NextResponse.json(
         { error: "No valid project updates provided." },
         { status: 400 }
       );
     }
 
-    updates.updated_at = new Date().toISOString();
+    if (Object.keys(updates).length > 0) {
+      updates.updated_at = new Date().toISOString();
+
+      const { error } = await supabaseAdmin
+        .from("portfolio_projects")
+        .update(updates)
+        .eq("id", id);
+
+      if (error) throw error;
+    }
+
+    if (hasGalleryUpdate) {
+      await saveGalleryImages(id, body.gallery_images);
+    }
 
     const { data, error } = await supabaseAdmin
       .from("portfolio_projects")
-      .update(updates)
+      .select("*, portfolio_project_images(*)")
       .eq("id", id)
-      .select()
       .single();
 
-    if (error) {
-      if (error.code === "23505") {
-        return NextResponse.json(
-          { error: "A project with this URL slug already exists." },
-          { status: 409 }
-        );
-      }
-
-      throw error;
-    }
+    if (error) throw error;
 
     return NextResponse.json({ project: data });
   } catch (error) {
@@ -305,5 +359,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-      }
-           
+}
