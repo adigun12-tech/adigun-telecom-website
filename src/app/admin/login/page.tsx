@@ -29,12 +29,24 @@ export default function AdminLoginPage() {
 
       if (error) throw error;
 
-      if (
-        data.user?.email?.toLowerCase() !==
-        process.env.NEXT_PUBLIC_ADMIN_EMAIL?.toLowerCase()
-      ) {
+      if (!data.session?.access_token) {
         await supabaseBrowser.auth.signOut();
-        throw new Error("You are not authorised to access the admin dashboard.");
+        throw new Error("Unable to establish a secure session.");
+      }
+
+      const response = await fetch("/api/admin/verify", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        await supabaseBrowser.auth.signOut();
+        throw new Error(
+          "You are not authorised to access the admin dashboard."
+        );
       }
 
       router.replace("/admin/enquiries");
@@ -124,14 +136,15 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
+
         <div className="mt-5 text-center">
-  <Link
-    href="/admin/forgot-password"
-    className="text-sm font-semibold text-blue-700 hover:underline"
-  >
-    Forgot your password?
-  </Link>
-</div>
+          <Link
+            href="/admin/forgot-password"
+            className="text-sm font-semibold text-blue-700 hover:underline"
+          >
+            Forgot your password?
+          </Link>
+        </div>
 
         <p className="mt-8 text-center text-xs text-slate-400">
           © {new Date().getFullYear()} Adigun Telecom
@@ -139,4 +152,4 @@ export default function AdminLoginPage() {
       </div>
     </main>
   );
-            }
+}
