@@ -74,13 +74,14 @@ export default function HomePage() {
             </span>
           </Link>
 
-          <nav className="desktop-nav">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#services">Services</a>
-            <a href="#products">Products</a>
-            <a href="#contact">Contact</a>
-          </nav>
+<nav className="desktop-nav">
+  <a href="#home">Home</a>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#products">Products</a>
+  <a href="#portfolio">Portfolio</a>
+  <a href="#contact">Contact</a>
+</nav>
           <MobileMenu />
 
           <a href="#contact" className="nav-cta">
