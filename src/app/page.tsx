@@ -337,29 +337,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="contact-section" id="contact">
-        <div className="container contact-content">
-          <span className="section-label">LET'S BUILD SOMETHING</span>
-          <h2>
-            Have a challenge?
-            <br />
-            Let's create a solution.
-          </h2>
-          <p>
-            Connect with Adigun Telecom to discuss your technology
-            needs and explore possibilities.
-          </p>
+<section className="contact-section" id="contact">
+  <div className="container contact-content">
+    <span className="section-label">LET'S BUILD SOMETHING</span>
 
-          <div className="contact-actions">
-            <a href="tel:+2347042723692" className="primary-button">
-              Call 07042723692 <ArrowRight size={18} />
-            </a>
-            <a href="tel:+2349078440739" className="contact-number">
-              09078440739
-            </a>
-          </div>
-        </div>
-      </section>
+    <h2>
+      Have a challenge?
+      <br />
+      Let's create a solution.
+    </h2>
+
+    <p>
+      Connect with Adigun Telecom to discuss your technology
+      needs and explore possibilities.
+    </p>
+
+    <div className="contact-actions">
+      <a href="tel:+2347042723692" className="primary-button">
+        Call 07042723692 <ArrowRight size={18} />
+      </a>
+
+      <a href="tel:+234907840739" className="contact-number">
+        09078440739
+      </a>
+
+      <a
+        href="mailto:adiguntelecoms@gmail.com"
+        className="contact-number"
+      >
+        Email Us
+      </a>
+    </div>
+  </div>
+</section>
 
       <footer className="footer">
         <div className="container footer-main">
