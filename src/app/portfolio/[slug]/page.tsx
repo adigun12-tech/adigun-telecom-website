@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,7 +10,15 @@ import {
   FolderKanban,
   Loader2,
   CheckCircle2,
+  Images,
 } from "lucide-react";
+
+type PortfolioImage = {
+  id: string;
+  image_url: string;
+  alt_text: string | null;
+  display_order: number;
+};
 
 type PortfolioProject = {
   id: string;
@@ -25,13 +32,15 @@ type PortfolioProject = {
   live_url: string | null;
   completion_status: "in_progress" | "completed";
   created_at: string;
+  portfolio_project_images?: PortfolioImage[];
 };
 
 export default function PortfolioProjectPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
 
-  const [project, setProject] = useState<PortfolioProject | null>(null);
+  const [project, setProject] =
+    useState<PortfolioProject | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -121,7 +130,8 @@ export default function PortfolioProjectPage() {
           </h1>
 
           <p style={{ color: "#64748b", marginTop: "12px" }}>
-            {error || "This project may have been removed or unpublished."}
+            {error ||
+              "This project may have been removed or unpublished."}
           </p>
 
           <Link
@@ -141,6 +151,16 @@ export default function PortfolioProjectPage() {
       </main>
     );
   }
+
+  const galleryImages = [
+    ...(project.portfolio_project_images || []),
+  ]
+    .sort((a, b) => a.display_order - b.display_order)
+    .filter(
+      (image) =>
+        image.image_url &&
+        image.image_url !== project.cover_image
+    );
 
   return (
     <main>
@@ -228,6 +248,7 @@ export default function PortfolioProjectPage() {
 
       <section className="section">
         <div className="container">
+          {/* MAIN PROJECT COVER */}
           {project.cover_image ? (
             <img
               src={project.cover_image}
@@ -260,6 +281,79 @@ export default function PortfolioProjectPage() {
             </div>
           )}
 
+          {/* PROJECT IMAGE GALLERY */}
+          {galleryImages.length > 0 && (
+            <div style={{ marginTop: "45px" }}>
+              <div style={{ marginBottom: "22px" }}>
+                <span className="section-label">
+                  PROJECT SHOWCASE
+                </span>
+
+                <h2
+                  style={{
+                    color: "#0A1830",
+                    fontSize: "1.8rem",
+                    fontWeight: 800,
+                    marginTop: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <Images size={25} color="#2879D8" />
+                  Project Gallery
+                </h2>
+
+                <p
+                  style={{
+                    color: "#64748b",
+                    marginTop: "8px",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  Explore more images from this project.
+                </p>
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
+                  gap: "18px",
+                }}
+              >
+                {galleryImages.map((image, index) => (
+                  <div
+                    key={image.id}
+                    style={{
+                      overflow: "hidden",
+                      borderRadius: "13px",
+                      border: "1px solid #e5ebf3",
+                      background: "#fff",
+                    }}
+                  >
+                    <img
+                      src={image.image_url}
+                      alt={
+                        image.alt_text ||
+                        `${project.title} gallery image ${index + 1}`
+                      }
+                      loading="lazy"
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: "260px",
+                        objectFit: "cover",
+                        transition: "transform .3s ease",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+                    {/* PROJECT OVERVIEW AND INFORMATION */}
           <div
             style={{
               display: "grid",
@@ -270,7 +364,9 @@ export default function PortfolioProjectPage() {
             }}
           >
             <div>
-              <span className="section-label">PROJECT OVERVIEW</span>
+              <span className="section-label">
+                PROJECT OVERVIEW
+              </span>
 
               <h2
                 style={{
@@ -324,6 +420,7 @@ export default function PortfolioProjectPage() {
                 >
                   CATEGORY
                 </p>
+
                 <p style={{ color: "#0A1830", marginTop: "6px" }}>
                   {project.category || "Digital Project"}
                 </p>
@@ -339,6 +436,7 @@ export default function PortfolioProjectPage() {
                 >
                   STATUS
                 </p>
+
                 <p style={{ color: "#0A1830", marginTop: "6px" }}>
                   {project.completion_status === "completed"
                     ? "Completed"
@@ -414,6 +512,7 @@ export default function PortfolioProjectPage() {
             </aside>
           </div>
 
+          {/* CONTACT CTA */}
           <div
             style={{
               marginTop: "60px",
@@ -462,5 +561,4 @@ export default function PortfolioProjectPage() {
       </section>
     </main>
   );
-  }
-              
+                  }
