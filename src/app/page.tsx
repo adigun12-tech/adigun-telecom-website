@@ -81,7 +81,7 @@ export default function HomePage() {
   <a href="services">Services</a>
   <a href="products">Products</a>
   <a href="portfolio">Portfolio</a>
-  <a href="#contact">Contact</a>
+  <a href="contact">Contact</a>
 </nav>
           <MobileMenu />
 
@@ -389,7 +389,7 @@ export default function HomePage() {
       <a href="services">Services</a>
       <a href="products">Products</a>
       <a href="portfolio">Portfolio</a>
-      <a href="#contact">Contact</a>
+      <a href="contact">Contact</a>
     </div>
   </div>
 
