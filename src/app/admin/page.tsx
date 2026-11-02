@@ -126,6 +126,7 @@ export default function AdminOverviewPage() {
       description:
         "Manage homepage, About, Services and Contact.",
       icon: Globe,
+      href: "/admin/website-content",
     },
     {
       title: "Media Library",
@@ -329,11 +330,8 @@ export default function AdminOverviewPage() {
             {upcomingSections.map((section) => {
               const Icon = section.icon;
 
-              return (
-                <div
-                  key={section.title}
-                  className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-                >
+              const cardContent = (
+                <>
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-500">
                     <Icon size={22} />
                   </div>
@@ -347,8 +345,31 @@ export default function AdminOverviewPage() {
                   </p>
 
                   <p className="mt-4 text-xs font-semibold text-slate-400">
-                    Coming soon
+                    {section.href
+                      ? "Open Management →"
+                      : "Coming soon"}
                   </p>
+                </>
+              );
+
+              if (section.href) {
+                return (
+                  <Link
+                    key={section.title}
+                    href={section.href}
+                    className="group rounded-xl border border-blue-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
+                  >
+                    {cardContent}
+                  </Link>
+                );
+              }
+
+              return (
+                <div
+                  key={section.title}
+                  className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  {cardContent}
                 </div>
               );
             })}
