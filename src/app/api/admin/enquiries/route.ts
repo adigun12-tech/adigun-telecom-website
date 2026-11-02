@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
+import { verifyAdmin } from "@/lib/verify-admin";
 
 export const runtime = "nodejs";
 
@@ -11,30 +12,6 @@ const allowedStatuses = [
   "completed",
   "cancelled",
 ];
-
-async function verifyAdmin(request: NextRequest) {
-  const authorization = request.headers.get("authorization");
-
-  if (!authorization?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = authorization.slice(7);
-
-  const { data, error } = await supabaseAdmin.auth.getUser(token);
-
-  if (error || !data.user?.email) {
-    return null;
-  }
-
-  const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-
-  if (!adminEmail || data.user.email.toLowerCase() !== adminEmail) {
-    return null;
-  }
-
-  return data.user;
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -96,10 +73,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (
-      status &&
-      !allowedStatuses.includes(status)
-    ) {
+    if (status && !allowedStatuses.includes(status)) {
       return NextResponse.json(
         { error: "Invalid enquiry status." },
         { status: 400 }
@@ -145,4 +119,4 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
-                  }
+}
