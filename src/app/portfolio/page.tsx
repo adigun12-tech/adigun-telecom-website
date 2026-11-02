@@ -5,14 +5,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  GraduationCap,
-  Building2,
-  Code2,
-  CheckCircle2,
-  Sparkles,
   ExternalLink,
   FolderKanban,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 
 type PortfolioProject = {
@@ -30,62 +26,10 @@ type PortfolioProject = {
   created_at: string;
 };
 
-const products = [
-  {
-    number: "01",
-    icon: GraduationCap,
-    name: "Adigun SchoolSuite",
-    category: "EDUCATION TECHNOLOGY",
-    status: "Flagship Product",
-    description:
-      "A modern school management platform designed to simplify academic administration, improve communication and connect schools, teachers, parents and students.",
-    features: [
-      "Student and staff management",
-      "Attendance and academic records",
-      "Digital report cards",
-      "Parent and student portals",
-      "School administration tools",
-    ],
-    href: "/#contact",
-  },
-  {
-    number: "02",
-    icon: Building2,
-    name: "Business Management Solutions",
-    category: "BUSINESS TECHNOLOGY",
-    status: "Custom Solutions",
-    description:
-      "Digital business tools designed to help organisations streamline operations, manage information and improve productivity.",
-    features: [
-      "Business management systems",
-      "Digital record management",
-      "Workflow improvement",
-      "Custom business platforms",
-    ],
-    href: "/#contact",
-  },
-  {
-    number: "03",
-    icon: Code2,
-    name: "Custom Software Products",
-    category: "SOFTWARE DEVELOPMENT",
-    status: "Project-Based",
-    description:
-      "Purpose-built software applications developed around specific business challenges, operational needs and digital opportunities.",
-    features: [
-      "Custom web applications",
-      "Database-driven platforms",
-      "Digital service applications",
-      "Tailored software solutions",
-    ],
-    href: "/#contact",
-  },
-];
-
-export default function ProductsPage() {
+export default function PortfolioPage() {
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
-  const [loadingProjects, setLoadingProjects] = useState(true);
-  const [projectsError, setProjectsError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -100,7 +44,7 @@ export default function ProductsPage() {
 
         if (!response.ok) {
           throw new Error(
-            result.error || "Unable to load projects."
+            result.error || "Unable to load portfolio projects."
           );
         }
 
@@ -109,16 +53,16 @@ export default function ProductsPage() {
             Array.isArray(result.projects) ? result.projects : []
           );
         }
-      } catch (error) {
+      } catch (err) {
         if (active) {
-          setProjectsError(
-            error instanceof Error
-              ? error.message
-              : "Unable to load projects."
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Unable to load portfolio projects."
           );
         }
       } finally {
-        if (active) setLoadingProjects(false);
+        if (active) setLoading(false);
       }
     }
 
@@ -131,314 +75,193 @@ export default function ProductsPage() {
 
   return (
     <main>
+      {/* PORTFOLIO HERO */}
       <section
         className="section"
-        style={{ background: "#0A1830", color: "#fff" }}
+        style={{
+          background:
+            "radial-gradient(circle at 85% 15%, rgba(40,121,216,.28), transparent 35%), #0A1830",
+          color: "#fff",
+        }}
       >
         <div
           className="container"
-          style={{ paddingTop: "70px", paddingBottom: "70px" }}
+          style={{
+            paddingTop: "85px",
+            paddingBottom: "85px",
+          }}
         >
-          <span className="section-label">OUR PRODUCTS</span>
+          <span className="section-label">
+            OUR PORTFOLIO
+          </span>
 
           <h1
             style={{
-              fontSize: "clamp(2.4rem, 6vw, 4rem)",
-              maxWidth: "850px",
-              lineHeight: 1.15,
-              marginTop: "20px",
+              fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+              maxWidth: "900px",
+              lineHeight: 1.12,
+              marginTop: "22px",
+              fontWeight: 800,
             }}
           >
-            Technology Products.
+            Ideas into Reality.
             <br />
-            Solutions for Progress.
+            <span style={{ color: "#7dbbff" }}>
+              Technology in Action.
+            </span>
           </h1>
 
           <p
             style={{
               color: "#c4d0df",
-              maxWidth: "680px",
+              maxWidth: "700px",
               fontSize: "1.08rem",
-              marginTop: "24px",
-              lineHeight: 1.8,
+              marginTop: "25px",
+              lineHeight: 1.9,
             }}
           >
-            Discover digital products and software solutions
-            being developed to help businesses and organisations
-            work smarter and achieve more.
-          </p>
-
-          <Link
-            href="/#contact"
-            className="primary-button"
-            style={{ marginTop: "30px", display: "inline-flex" }}
-          >
-            Discuss a Product <ArrowRight size={18} />
-          </Link>
-        </div>
-      </section>
-
-      {/* EXISTING PRODUCTS */}
-      <section className="section">
-        <div className="container">
-          <span className="section-label">THE ADIGUN ECOSYSTEM</span>
-
-          <h2 className="section-title">
-            Digital Solutions Built for Real Needs.
-          </h2>
-
-          <p className="section-description">
-            We focus on creating useful technology products
-            that address practical challenges across different
-            sectors.
+            Explore selected projects designed, developed
+            and delivered by Adigun Telecom. Each project
+            represents our commitment to practical innovation,
+            quality and meaningful digital solutions.
           </p>
 
           <div
             style={{
-              display: "grid",
-              gap: "28px",
-              marginTop: "45px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "15px",
+              marginTop: "32px",
             }}
           >
-            {products.map((product) => {
-              const Icon = product.icon;
+            <Link
+              href="/#contact"
+              className="primary-button"
+              style={{ display: "inline-flex" }}
+            >
+              Start a Project <ArrowRight size={18} />
+            </Link>
 
-              return (
-                <article
-                  key={product.number}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(260px, 1fr))",
-                    border: "1px solid #e5ebf3",
-                    borderRadius: "14px",
-                    overflow: "hidden",
-                    background: "#fff",
-                  }}
-                >
-                  <div
-                    style={{
-                      background:
-                        "radial-gradient(circle at 80% 20%, rgba(40,121,216,.35), transparent 45%), #0A1830",
-                      minHeight: "260px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      padding: "35px",
-                      color: "#fff",
-                      textAlign: "center",
-                    }}
-                  >
-                    <Icon size={65} color="#7dbbff" strokeWidth={1.5} />
-
-                    <span
-                      style={{
-                        marginTop: "24px",
-                        fontSize: ".72rem",
-                        letterSpacing: "2px",
-                        color: "#a9c9f1",
-                        fontWeight: 800,
-                      }}
-                    >
-                      ADIGUN TELECOM
-                    </span>
-
-                    <span
-                      style={{
-                        fontSize: "2rem",
-                        fontWeight: 800,
-                        marginTop: "8px",
-                      }}
-                    >
-                      {product.number}
-                    </span>
-                  </div>
-
-                  <div style={{ padding: "35px" }}>
-                    <span
-                      style={{
-                        color: "#2879D8",
-                        fontSize: ".7rem",
-                        letterSpacing: "1.5px",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {product.category}
-                    </span>
-
-                    <h2
-                      style={{
-                        color: "#0A1830",
-                        fontSize: "1.7rem",
-                        lineHeight: 1.25,
-                        marginTop: "12px",
-                      }}
-                    >
-                      {product.name}
-                    </h2>
-
-                    <span
-                      style={{
-                        display: "inline-block",
-                        marginTop: "13px",
-                        padding: "7px 11px",
-                        background: "#eaf3ff",
-                        color: "#2365ac",
-                        borderRadius: "5px",
-                        fontSize: ".72rem",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {product.status}
-                    </span>
-
-                    <p
-                      style={{
-                        color: "#64748b",
-                        lineHeight: 1.8,
-                        marginTop: "18px",
-                      }}
-                    >
-                      {product.description}
-                    </p>
-
-                    <div
-                      style={{
-                        display: "grid",
-                        gap: "12px",
-                        marginTop: "22px",
-                      }}
-                    >
-                      {product.features.map((feature) => (
-                        <div
-                          key={feature}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            color: "#334155",
-                            fontSize: ".88rem",
-                          }}
-                        >
-                          <CheckCircle2
-                            size={17}
-                            color="#2879D8"
-                            style={{ flexShrink: 0 }}
-                          />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-
-                    <Link
-                      href={product.href}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "9px",
-                        color: "#2879D8",
-                        fontWeight: 800,
-                        marginTop: "27px",
-                      }}
-                    >
-                      Make an Enquiry <ArrowRight size={18} />
-                    </Link>
-                  </div>
-                </article>
-              );
-            })}
+            <Link
+              href="/products"
+              className="secondary-button"
+            >
+              Explore Our Products
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* DYNAMIC FEATURED PROJECTS */}
-      <section
-        className="section"
-        style={{ background: "#F4F7FB" }}
-      >
+      {/* PROJECT COLLECTION */}
+      <section className="section">
         <div className="container">
-          <span className="section-label">OUR PORTFOLIO</span>
+          <div
+            style={{
+              marginBottom: "38px",
+              maxWidth: "750px",
+            }}
+          >
+            <span className="section-label">
+              SELECTED WORK
+            </span>
 
-          <h2 className="section-title">
-            Featured Projects.
-          </h2>
+            <h2 className="section-title">
+              Projects That Demonstrate Our Work.
+            </h2>
 
-          <p className="section-description">
-            Explore selected digital projects and solutions
-            created by Adigun Telecom.
-          </p>
+            <p className="section-description">
+              From websites and software platforms to
+              education technology and business solutions,
+              discover the work behind our digital innovation.
+            </p>
+          </div>
 
-          {loadingProjects ? (
+          {loading ? (
             <div
               style={{
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 gap: "12px",
-                padding: "65px 15px",
+                padding: "80px 15px",
                 color: "#64748b",
               }}
             >
-              <Loader2 size={22} className="animate-spin" />
-              Loading featured projects...
+              <Loader2
+                size={23}
+                className="animate-spin"
+              />
+              Loading portfolio projects...
             </div>
-          ) : projectsError ? (
-            <p
-              style={{
-                textAlign: "center",
-                color: "#b91c1c",
-                padding: "45px 15px",
-              }}
-            >
-              {projectsError}
-            </p>
-          ) : projects.length === 0 ? (
+          ) : error ? (
             <div
               style={{
                 textAlign: "center",
                 padding: "55px 20px",
-                marginTop: "35px",
                 background: "#fff",
+                border: "1px solid #fee2e2",
+                borderRadius: "14px",
+                color: "#b91c1c",
+              }}
+            >
+              {error}
+            </div>
+          ) : projects.length === 0 ? (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "75px 20px",
+                background: "#F4F7FB",
                 border: "1px solid #e5ebf3",
                 borderRadius: "14px",
               }}
             >
               <FolderKanban
-                size={42}
+                size={48}
                 color="#2879D8"
-                style={{ margin: "0 auto 15px" }}
+                style={{ margin: "0 auto 18px" }}
               />
 
               <h3
                 style={{
                   color: "#0A1830",
-                  fontSize: "1.2rem",
+                  fontSize: "1.4rem",
                   fontWeight: 800,
                 }}
               >
-                Projects Coming Soon
+                Our Projects Are Coming Soon
               </h3>
 
               <p
                 style={{
                   color: "#64748b",
-                  marginTop: "10px",
-                  lineHeight: 1.7,
+                  maxWidth: "500px",
+                  margin: "12px auto 0",
+                  lineHeight: 1.8,
                 }}
               >
-                Our featured projects will appear here as they
-                are published.
+                We are preparing our project showcase.
+                Published projects will appear here.
               </p>
+
+              <Link
+                href="/#contact"
+                className="primary-button"
+                style={{
+                  display: "inline-flex",
+                  marginTop: "25px",
+                }}
+              >
+                Work With Us <ArrowRight size={17} />
+              </Link>
             </div>
           ) : (
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns:
-                  "repeat(auto-fit, minmax(270px, 1fr))",
-                gap: "25px",
-                marginTop: "40px",
+                  "repeat(auto-fit, minmax(min(100%, 310px), 1fr))",
+                gap: "28px",
               }}
             >
               {projects.map((project) => (
@@ -452,6 +275,7 @@ export default function ProductsPage() {
                     display: "flex",
                     flexDirection: "column",
                     minWidth: 0,
+                    boxShadow: "0 8px 28px rgba(10,24,48,.045)",
                   }}
                 >
                   {project.cover_image ? (
@@ -461,7 +285,7 @@ export default function ProductsPage() {
                       loading="lazy"
                       style={{
                         width: "100%",
-                        height: "220px",
+                        height: "245px",
                         objectFit: "cover",
                         display: "block",
                       }}
@@ -469,7 +293,7 @@ export default function ProductsPage() {
                   ) : (
                     <div
                       style={{
-                        height: "220px",
+                        height: "245px",
                         background:
                           "radial-gradient(circle at 80% 20%, rgba(40,121,216,.4), transparent 45%), #0A1830",
                         display: "flex",
@@ -478,7 +302,7 @@ export default function ProductsPage() {
                       }}
                     >
                       <FolderKanban
-                        size={58}
+                        size={65}
                         color="#7dbbff"
                         strokeWidth={1.4}
                       />
@@ -487,7 +311,7 @@ export default function ProductsPage() {
 
                   <div
                     style={{
-                      padding: "25px",
+                      padding: "27px",
                       display: "flex",
                       flexDirection: "column",
                       flex: 1,
@@ -496,8 +320,8 @@ export default function ProductsPage() {
                     <span
                       style={{
                         color: "#2879D8",
-                        fontSize: ".7rem",
-                        letterSpacing: "1.3px",
+                        fontSize: ".72rem",
+                        letterSpacing: "1.4px",
                         fontWeight: 800,
                         textTransform: "uppercase",
                       }}
@@ -508,10 +332,10 @@ export default function ProductsPage() {
                     <h3
                       style={{
                         color: "#0A1830",
-                        fontSize: "1.3rem",
+                        fontSize: "1.4rem",
                         lineHeight: 1.35,
                         fontWeight: 800,
-                        marginTop: "10px",
+                        marginTop: "12px",
                       }}
                     >
                       {project.title}
@@ -520,8 +344,8 @@ export default function ProductsPage() {
                     <span
                       style={{
                         alignSelf: "flex-start",
-                        marginTop: "12px",
-                        padding: "6px 10px",
+                        marginTop: "13px",
+                        padding: "7px 11px",
                         borderRadius: "5px",
                         background:
                           project.completion_status === "completed"
@@ -543,14 +367,14 @@ export default function ProductsPage() {
                     <p
                       style={{
                         color: "#64748b",
-                        lineHeight: 1.75,
-                        fontSize: ".9rem",
-                        marginTop: "16px",
+                        lineHeight: 1.8,
+                        fontSize: ".92rem",
+                        marginTop: "18px",
                       }}
                     >
                       {project.short_description ||
                         project.description ||
-                        "Discover this project by Adigun Telecom."}
+                        "Discover this digital project by Adigun Telecom."}
                     </p>
 
                     {project.technologies &&
@@ -559,19 +383,19 @@ export default function ProductsPage() {
                           style={{
                             display: "flex",
                             flexWrap: "wrap",
-                            gap: "7px",
-                            marginTop: "18px",
+                            gap: "8px",
+                            marginTop: "19px",
                           }}
                         >
                           {project.technologies.map((technology) => (
                             <span
                               key={technology}
                               style={{
-                                padding: "6px 9px",
+                                padding: "6px 10px",
                                 background: "#eef4fb",
                                 color: "#365575",
                                 borderRadius: "5px",
-                                fontSize: ".7rem",
+                                fontSize: ".72rem",
                                 fontWeight: 700,
                               }}
                             >
@@ -588,7 +412,7 @@ export default function ProductsPage() {
                         gap: "18px",
                         alignItems: "center",
                         marginTop: "auto",
-                        paddingTop: "24px",
+                        paddingTop: "27px",
                       }}
                     >
                       <Link
@@ -599,10 +423,10 @@ export default function ProductsPage() {
                           gap: "7px",
                           color: "#2879D8",
                           fontWeight: 800,
-                          fontSize: ".85rem",
+                          fontSize: ".88rem",
                         }}
                       >
-                        View Details <ArrowRight size={17} />
+                        View Project <ArrowRight size={17} />
                       </Link>
 
                       {project.live_url && (
@@ -613,13 +437,14 @@ export default function ProductsPage() {
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
-                            gap: "6px",
+                            gap: "7px",
                             color: "#64748b",
                             fontWeight: 700,
-                            fontSize: ".82rem",
+                            fontSize: ".84rem",
                           }}
                         >
-                          Live Project <ExternalLink size={15} />
+                          Visit Live Site
+                          <ExternalLink size={15} />
                         </a>
                       )}
                     </div>
@@ -631,7 +456,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* EXISTING CONTACT SECTION */}
+      {/* PROJECT ENQUIRY */}
       <section
         className="section"
         style={{
@@ -640,16 +465,20 @@ export default function ProductsPage() {
         }}
       >
         <div className="container">
-          <Sparkles size={35} color="#2879D8" />
+          <Sparkles
+            size={38}
+            color="#2879D8"
+          />
 
           <h2
             style={{
               color: "#0A1830",
               fontSize: "clamp(2rem, 5vw, 3rem)",
-              marginTop: "18px",
+              marginTop: "20px",
+              lineHeight: 1.2,
             }}
           >
-            Have an idea for a digital product?
+            Have a Project in Mind?
           </h2>
 
           <p
@@ -660,16 +489,19 @@ export default function ProductsPage() {
               lineHeight: 1.8,
             }}
           >
-            Let's discuss your idea and explore how technology
-            can turn it into a practical solution.
+            Let's turn your ideas into practical digital
+            solutions. Tell us what you want to build.
           </p>
 
           <Link
             href="/#contact"
             className="primary-button"
-            style={{ marginTop: "28px", display: "inline-flex" }}
+            style={{
+              marginTop: "30px",
+              display: "inline-flex",
+            }}
           >
-            Talk to Our Team <ArrowRight size={18} />
+            Discuss Your Project <ArrowRight size={18} />
           </Link>
         </div>
       </section>
