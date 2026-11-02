@@ -371,32 +371,34 @@ export default function HomePage() {
   </div>
 </section>
 
-      <footer className="footer">
-        <div className="container footer-main">
-          <Link href="/" className="brand footer-brand">
-            <span className="brand-mark">A</span>
-            <span>
-              <strong>ADIGUN</strong>
-              <small>TELECOM</small>
-            </span>
-          </Link>
+<footer className="footer">
+  <div className="container footer-main">
+    <Link href="/" className="brand footer-brand">
+      <span className="brand-mark">A</span>
+      <span>
+        <strong>ADIGUN</strong>
+        <small>TELECOM</small>
+      </span>
+    </Link>
 
-          <p>Building Technology. Empowering Progress.</p>
+    <p>Building Technology. Empowering Progress.</p>
 
-          <div className="footer-links">
-            <a href="#home">Home</a>
-            <a href="#about">About</a>
-            <a href="#services">Services</a>
-            <a href="#contact">Contact</a>
-          </div>
-        </div>
+    <div className="footer-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#products">Products</a>
+      <a href="#portfolio">Portfolio</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
 
-        <div className="container footer-bottom">
-          <span>© {new Date().getFullYear()} Adigun Telecom.</span>
-          <span>Building a smarter digital future.</span>
-        </div>
-      </footer>
-      <WhatsAppButton />
+  <div className="container footer-bottom">
+    <span>© {new Date().getFullYear()} Adigun Telecom.</span>
+    <span>Building a smarter digital future.</span>
+  </div>
+</footer>
+<WhatsAppButton />
     </main>
   );
               }
