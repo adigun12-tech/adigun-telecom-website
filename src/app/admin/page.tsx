@@ -90,7 +90,8 @@ export default function AdminOverviewPage() {
 
       if (!enquiriesResponse.ok) {
         throw new Error(
-          enquiriesResult.error || "Unable to load dashboard statistics."
+          enquiriesResult.error ||
+            "Unable to load dashboard statistics."
         );
       }
 
@@ -121,28 +122,27 @@ export default function AdminOverviewPage() {
 
   const upcomingSections = [
     {
-      title: "Portfolio Management",
-      description: "Add, edit and publish completed projects.",
-      icon: FolderKanban,
-    },
-    {
       title: "Website Content",
-      description: "Manage homepage, About, Services and Contact.",
+      description:
+        "Manage homepage, About, Services and Contact.",
       icon: Globe,
     },
     {
       title: "Media Library",
-      description: "Organise website images and project media.",
+      description:
+        "Organise website images and project media.",
       icon: ImageIcon,
     },
     {
       title: "Administrator Management",
-      description: "Manage administrator accounts and permissions.",
+      description:
+        "Manage administrator accounts and permissions.",
       icon: Users,
     },
     {
       title: "Website Settings",
-      description: "Manage website configuration and preferences.",
+      description:
+        "Manage website configuration and preferences.",
       icon: Settings,
     },
   ];
@@ -155,6 +155,7 @@ export default function AdminOverviewPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">
               Adigun Telecom
             </p>
+
             <h1 className="mt-1 text-xl font-bold sm:text-2xl">
               Admin Dashboard
             </h1>
@@ -182,7 +183,7 @@ export default function AdminOverviewPage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
+        <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-blue-700">
             Welcome back
           </p>
@@ -195,6 +196,7 @@ export default function AdminOverviewPage() {
             {admin ? (
               <>
                 <span>{admin.email}</span>
+
                 <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold capitalize text-blue-700">
                   {admin.role}
                 </span>
@@ -210,6 +212,7 @@ export default function AdminOverviewPage() {
             <h2 className="text-xl font-bold text-[#0A1830]">
               Business Overview
             </h2>
+
             <p className="mt-1 text-sm text-slate-500">
               Monitor website enquiries and management activities.
             </p>
@@ -256,12 +259,16 @@ export default function AdminOverviewPage() {
                   <p className="text-xs font-medium text-slate-500">
                     {item.label}
                   </p>
+
                   <Icon size={19} className="text-blue-600" />
                 </div>
 
                 <p className="mt-4 text-3xl font-bold text-[#0A1830]">
                   {loading ? (
-                    <Loader2 className="animate-spin" size={23} />
+                    <Loader2
+                      className="animate-spin"
+                      size={23}
+                    />
                   ) : (
                     item.value
                   )}
@@ -291,6 +298,27 @@ export default function AdminOverviewPage() {
 
               <p className="mt-2 text-sm leading-6 text-slate-500">
                 Review client requests, update statuses and save private notes.
+              </p>
+
+              <p className="mt-4 text-sm font-semibold text-blue-700">
+                Open Management →
+              </p>
+            </Link>
+
+            <Link
+              href="/admin/portfolio"
+              className="group rounded-xl border border-blue-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-blue-500 hover:shadow-md"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
+                <FolderKanban size={22} />
+              </div>
+
+              <h3 className="mt-4 font-bold text-[#0A1830]">
+                Portfolio Management
+              </h3>
+
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                Create, edit, publish and manage your company projects.
               </p>
 
               <p className="mt-4 text-sm font-semibold text-blue-700">
@@ -333,5 +361,4 @@ export default function AdminOverviewPage() {
       </div>
     </main>
   );
-          }
-      
+}
