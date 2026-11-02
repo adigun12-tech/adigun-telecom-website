@@ -77,11 +77,11 @@ export default function HomePage() {
 
 <nav className="desktop-nav">
   <Link href="/#home">Home</Link>
-  <a href="about">About</a>
-  <a href="services">Services</a>
-  <a href="products">Products</a>
-  <a href="portfolio">Portfolio</a>
-  <a href="contact">Contact</a>
+  <Link href="/about">About</Link>
+  <Link href="/services">Services</Link>
+  <Link href="/products">Products</Link>
+  <Link href="/portfolio">Portfolio</Link>
+  <Link href="/#contact">Contact</Link>
 </nav>
           <MobileMenu />
 
@@ -383,14 +383,14 @@ export default function HomePage() {
 
     <p>Building Technology. Empowering Progress.</p>
 
-    <div className="footer-links">
-      <a href="#home">Home</a>
-      <a href="about">About</a>
-      <a href="services">Services</a>
-      <a href="products">Products</a>
-      <a href="portfolio">Portfolio</a>
-      <a href="contact">Contact</a>
-    </div>
+<div className="footer-links">
+  <Link href="/#home">Home</Link>
+  <Link href="/#about">About</Link>
+  <Link href="/#services">Services</Link>
+  <Link href="/products">Products</Link>
+  <Link href="/portfolio">Portfolio</Link>
+  <Link href="/#contact">Contact</Link>
+</div>
   </div>
 
   <div className="container footer-bottom">
