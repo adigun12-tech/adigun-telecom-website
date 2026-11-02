@@ -78,8 +78,8 @@ export default function HomePage() {
 <nav className="desktop-nav">
   <a href="#home">Home</a>
   <a href="about">About</a>
-  <a href="#services">Services</a>
-  <a href="#products">Products</a>
+  <a href="services">Services</a>
+  <a href="products">Products</a>
   <a href="#portfolio">Portfolio</a>
   <a href="#contact">Contact</a>
 </nav>
@@ -386,8 +386,8 @@ export default function HomePage() {
     <div className="footer-links">
       <a href="#home">Home</a>
       <a href="about">About</a>
-      <a href="#services">Services</a>
-      <a href="#products">Products</a>
+      <a href="services">Services</a>
+      <a href="products">Products</a>
       <a href="#portfolio">Portfolio</a>
       <a href="#contact">Contact</a>
     </div>
