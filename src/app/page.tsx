@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import MobileMenu from "@/components/MobileMenu";
 import {
   ArrowRight,
   Code2,
@@ -80,6 +81,7 @@ export default function HomePage() {
             <a href="#products">Products</a>
             <a href="#contact">Contact</a>
           </nav>
+          <MobileMenu />
 
           <a href="#contact" className="nav-cta">
             Let's Talk <ArrowRight size={16} />
