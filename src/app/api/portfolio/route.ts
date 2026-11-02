@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
 
@@ -10,9 +9,26 @@ export async function GET(request: NextRequest) {
 
     let query = supabaseAdmin
       .from("portfolio_projects")
-      .select(
-        "id, title, slug, short_description, description, category, technologies, cover_image, live_url, completion_status, display_order, created_at"
-      )
+      .select(`
+        id,
+        title,
+        slug,
+        short_description,
+        description,
+        category,
+        technologies,
+        cover_image,
+        live_url,
+        completion_status,
+        display_order,
+        created_at,
+        portfolio_project_images (
+          id,
+          image_url,
+          alt_text,
+          display_order
+        )
+      `)
       .eq("is_published", true);
 
     if (slug) {
@@ -32,8 +48,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const projects = (data || []).map((project) => ({
+      ...project,
+      portfolio_project_images: [
+        ...(project.portfolio_project_images || []),
+      ].sort(
+        (a, b) => a.display_order - b.display_order
+      ),
+    }));
+
     return NextResponse.json(
-      slug ? { project: data[0] } : { projects: data }
+      slug ? { project: projects[0] } : { projects }
     );
   } catch (error) {
     console.error("Public portfolio GET error:", error);
