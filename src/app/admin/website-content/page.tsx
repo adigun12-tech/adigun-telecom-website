@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabaseBrowser } from "@/lib/supabase-browser";
@@ -132,6 +133,45 @@ const defaultContent: WebsiteContent = {
   },
 };
 
+const inputClass =
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+
+const labelClass =
+  "mb-2 block text-sm font-semibold text-[#0A1830]";
+
+function Field({
+  label,
+  value,
+  onChange,
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  multiline?: boolean;
+}) {
+  return (
+    <div>
+      <label className={labelClass}>{label}</label>
+
+      {multiline ? (
+        <textarea
+          className={inputClass}
+          rows={4}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <input
+          className={inputClass}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+    </div>
+  );
+}
+
 function mergeContent(saved: any): WebsiteContent {
   return {
     hero: { ...defaultContent.hero, ...saved?.hero },
@@ -150,7 +190,10 @@ function mergeContent(saved: any): WebsiteContent {
         ? saved.values.items
         : defaultContent.values.items,
     },
-    contact: { ...defaultContent.contact, ...saved?.contact },
+    contact: {
+      ...defaultContent.contact,
+      ...saved?.contact,
+    },
   };
 }
 
@@ -164,7 +207,7 @@ export default function WebsiteContentPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function getToken() {
+  const getToken = useCallback(async () => {
     const { data, error } =
       await supabaseBrowser.auth.getSession();
 
@@ -178,15 +221,16 @@ export default function WebsiteContentPage() {
     }
 
     return token;
-  }
+  }, [router]);
 
-  async function loadContent() {
+  const loadContent = useCallback(async () => {
     setLoading(true);
     setError("");
     setMessage("");
 
     try {
       const token = await getToken();
+
       if (!token) return;
 
       const response = await fetch(
@@ -223,11 +267,11 @@ export default function WebsiteContentPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [getToken, router]);
 
   useEffect(() => {
-    loadContent();
-  }, []);
+    void loadContent();
+  }, [loadContent]);
 
   function updateSection<
     K extends keyof WebsiteContent,
@@ -252,6 +296,7 @@ export default function WebsiteContentPage() {
     value: string
   ) {
     const items = [...content.services.items];
+
     items[index] = {
       ...items[index],
       [field]: value,
@@ -278,6 +323,7 @@ export default function WebsiteContentPage() {
   function updateValue(index: number, value: string) {
     const items = [...content.values.items];
     items[index] = value;
+
     updateSection("values", "items", items);
   }
 
@@ -303,6 +349,7 @@ export default function WebsiteContentPage() {
 
     try {
       const token = await getToken();
+
       if (!token) return;
 
       const response = await fetch(
@@ -341,44 +388,6 @@ export default function WebsiteContentPage() {
     } finally {
       setSaving(false);
     }
-  }
-
-  const inputClass =
-    "w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
-
-  const labelClass =
-    "mb-2 block text-sm font-semibold text-[#0A1830]";
-
-  function Field({
-    label,
-    value,
-    onChange,
-    multiline = false,
-  }: {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    multiline?: boolean;
-  }) {
-    return (
-      <div>
-        <label className={labelClass}>{label}</label>
-        {multiline ? (
-          <textarea
-            className={inputClass}
-            rows={4}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        ) : (
-          <input
-            className={inputClass}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          />
-        )}
-      </div>
-    );
   }
 
   if (loading) {
@@ -454,16 +463,19 @@ export default function WebsiteContentPage() {
               value={content.hero.tag}
               onChange={(v) => updateSection("hero", "tag", v)}
             />
+
             <Field
               label="Main Heading"
               value={content.hero.heading}
               onChange={(v) => updateSection("hero", "heading", v)}
             />
+
             <Field
               label="Highlighted Heading"
               value={content.hero.highlight}
               onChange={(v) => updateSection("hero", "highlight", v)}
             />
+
             <Field
               label="Hero Description"
               multiline
@@ -491,11 +503,13 @@ export default function WebsiteContentPage() {
               value={content.about.label}
               onChange={(v) => updateSection("about", "label", v)}
             />
+
             <Field
               label="Heading"
               value={content.about.heading}
               onChange={(v) => updateSection("about", "heading", v)}
             />
+
             <Field
               label="First Paragraph"
               multiline
@@ -504,6 +518,7 @@ export default function WebsiteContentPage() {
                 updateSection("about", "paragraph1", v)
               }
             />
+
             <Field
               label="Second Paragraph"
               multiline
@@ -514,7 +529,7 @@ export default function WebsiteContentPage() {
             />
           </div>
         </section>
-
+        
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-6 border-b border-slate-100 pb-4">
             <h2 className="text-lg font-bold text-[#0A1830]">
@@ -531,6 +546,7 @@ export default function WebsiteContentPage() {
               value={content.services.label}
               onChange={(v) => updateSection("services", "label", v)}
             />
+
             <Field
               label="Section Heading"
               value={content.services.heading}
@@ -538,6 +554,7 @@ export default function WebsiteContentPage() {
                 updateSection("services", "heading", v)
               }
             />
+
             <Field
               label="Section Description"
               multiline
@@ -557,6 +574,7 @@ export default function WebsiteContentPage() {
                     <h3 className="text-sm font-bold text-[#0A1830]">
                       Service {index + 1}
                     </h3>
+
                     <button
                       type="button"
                       onClick={() => removeService(index)}
@@ -575,6 +593,7 @@ export default function WebsiteContentPage() {
                         updateService(index, "title", v)
                       }
                     />
+
                     <Field
                       label="Service Description"
                       multiline
@@ -615,11 +634,13 @@ export default function WebsiteContentPage() {
               value={content.values.label}
               onChange={(v) => updateSection("values", "label", v)}
             />
+
             <Field
               label="Heading"
               value={content.values.heading}
               onChange={(v) => updateSection("values", "heading", v)}
             />
+
             <Field
               label="Description"
               multiline
@@ -639,6 +660,7 @@ export default function WebsiteContentPage() {
                       updateValue(index, e.target.value)
                     }
                   />
+
                   <button
                     type="button"
                     onClick={() => removeValue(index)}
@@ -678,62 +700,70 @@ export default function WebsiteContentPage() {
               value={content.contact.label}
               onChange={(v) => updateSection("contact", "label", v)}
             />
+
             <Field
               label="Heading"
               value={content.contact.heading}
               onChange={(v) => updateSection("contact", "heading", v)}
             />
+
             <Field
               label="Description"
               multiline
               value={content.contact.description}
-                              onChange={(v) =>
-                  updateSection("contact", "description", v)
-                }
-              />
-              <Field
-                label="First Phone Number"
-                value={content.contact.phone1}
-                onChange={(v) =>
-                  updateSection("contact", "phone1", v)
-                }
-              />
-              <Field
-                label="Second Phone Number"
-                value={content.contact.phone2}
-                onChange={(v) =>
-                  updateSection("contact", "phone2", v)
-                }
-              />
-              <Field
-                label="Email Address"
-                value={content.contact.email}
-                onChange={(v) =>
-                  updateSection("contact", "email", v)
-                }
-              />
-            </div>
-          </section>
+              onChange={(v) =>
+                updateSection("contact", "description", v)
+              }
+            />
 
-          <div className="sticky bottom-3 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-slate-500">
-              Save your changes to the website content database.
-            </p>
+            <Field
+              label="First Phone Number"
+              value={content.contact.phone1}
+              onChange={(v) =>
+                updateSection("contact", "phone1", v)
+              }
+            />
 
-            <button
-              onClick={saveContent}
-              disabled={saving}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0A1830] px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {saving ? (
-                <Loader2 className="animate-spin" size={18} />
-              ) : (
-                <Save size={18} />
-              )}
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
+            <Field
+              label="Second Phone Number"
+              value={content.contact.phone2}
+              onChange={(v) =>
+                updateSection("contact", "phone2", v)
+              }
+            />
+
+            <Field
+              label="Email Address"
+              value={content.contact.email}
+              onChange={(v) =>
+                updateSection("contact", "email", v)
+              }
+            />
           </div>
+        </section>
+
+        <div className="sticky bottom-3 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-slate-500">
+            Save your changes to the website content database.
+          </p>
+
+          <button
+            onClick={saveContent}
+            disabled={saving}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#0A1830] px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {saving ? (
+              <Loader2 className="animate-spin" size={18} />
+            ) : (
+              <Save size={18} />
+            )}
+
+            {saving ? "Saving..." : "Save Changes"}
+          </button>
         </div>
-            </main>
-    );
-}
+      </div>
+    </main>
+  );
+                }
+
+    
