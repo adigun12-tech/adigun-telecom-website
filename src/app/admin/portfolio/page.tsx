@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
@@ -21,6 +20,12 @@ import {
   FolderKanban,
 } from "lucide-react";
 
+type GalleryImage = {
+  id: string;
+  image_url: string;
+  display_order: number;
+};
+
 type Project = {
   id: string;
   title: string;
@@ -35,6 +40,7 @@ type Project = {
   is_published: boolean;
   display_order: number;
   created_at: string;
+  portfolio_project_images?: GalleryImage[];
 };
 
 type ProjectForm = {
@@ -80,6 +86,8 @@ export default function AdminPortfolioPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [search, setSearch] = useState("");
@@ -135,6 +143,7 @@ export default function AdminPortfolioPage() {
   function openNewForm() {
     setEditingId(null);
     setForm(emptyForm);
+    setGalleryImages([]);
     setError("");
     setSuccess("");
     setShowForm(true);
@@ -142,6 +151,13 @@ export default function AdminPortfolioPage() {
 
   function openEditForm(project: Project) {
     setEditingId(project.id);
+
+    setGalleryImages(
+      (project.portfolio_project_images || [])
+        .sort((a, b) => a.display_order - b.display_order)
+        .map((image) => image.image_url)
+    );
+
     setForm({
       title: project.title || "",
       slug: project.slug || "",
@@ -155,6 +171,7 @@ export default function AdminPortfolioPage() {
       is_published: project.is_published,
       display_order: String(project.display_order ?? 0),
     });
+
     setError("");
     setSuccess("");
     setShowForm(true);
@@ -212,6 +229,82 @@ export default function AdminPortfolioPage() {
     }
   }
 
+  async function uploadGallery(files: FileList | null) {
+    if (!files || files.length === 0) return;
+
+    setError("");
+    setSuccess("");
+
+    const selectedFiles = Array.from(files);
+
+    if (galleryImages.length + selectedFiles.length > 30) {
+      setError("A project can have a maximum of 30 gallery images.");
+      return;
+    }
+
+    for (const file of selectedFiles) {
+      if (!file.type.startsWith("image/")) {
+        setError("All selected files must be valid images.");
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`${file.name} exceeds the 5 MB image limit.`);
+        return;
+      }
+    }
+
+    setUploadingGallery(true);
+
+    try {
+      const { data } = await supabaseBrowser.auth.getSession();
+
+      if (!data.session) {
+        router.replace("/admin/login");
+        return;
+      }
+
+      const uploadedUrls: string[] = [];
+
+      for (const file of selectedFiles) {
+        const extension =
+          file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+        const filePath = `gallery/${crypto.randomUUID()}.${extension}`;
+
+        const { error: uploadError } = await supabaseBrowser.storage
+          .from("portfolio-images")
+          .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = supabaseBrowser.storage
+          .from("portfolio-images")
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(publicData.publicUrl);
+      }
+
+      setGalleryImages((previous) => [...previous, ...uploadedUrls]);
+      setSuccess(`${uploadedUrls.length} gallery image(s) uploaded.`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Gallery upload failed."
+      );
+    } finally {
+      setUploadingGallery(false);
+    }
+  }
+
+  function removeGalleryImage(index: number) {
+    setGalleryImages((previous) =>
+      previous.filter((_, imageIndex) => imageIndex !== index)
+    );
+  }
+
   async function saveProject(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -235,6 +328,7 @@ export default function AdminPortfolioPage() {
           .map((item) => item.trim())
           .filter(Boolean),
         display_order: Number(form.display_order) || 0,
+        gallery_images: galleryImages,
       };
 
       const response = await fetch("/api/admin/portfolio", {
@@ -254,10 +348,14 @@ export default function AdminPortfolioPage() {
         throw new Error(result.error || "Unable to save project.");
       }
 
+      const wasEditing = Boolean(editingId);
+
       setShowForm(false);
       setForm(emptyForm);
+      setGalleryImages([]);
       setEditingId(null);
-      setSuccess(editingId ? "Project updated." : "Project created.");
+      setSuccess(wasEditing ? "Project updated." : "Project created.");
+
       await loadProjects();
     } catch (err) {
       setError(
@@ -379,8 +477,7 @@ export default function AdminPortfolioPage() {
   const completedCount = projects.filter(
     (project) => project.completion_status === "completed"
   ).length;
-
-  return (
+    return (
     <main className="min-h-screen bg-[#F4F7FB]">
       <header className="bg-[#0A1830] px-5 py-5 text-white sm:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
@@ -525,6 +622,13 @@ export default function AdminPortfolioPage() {
                   >
                     {project.is_published ? "Published" : "Draft"}
                   </span>
+
+                  {(project.portfolio_project_images?.length || 0) > 0 && (
+                    <span className="absolute right-3 top-3 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white">
+                      <ImagePlus size={12} className="mr-1 inline" />
+                      {project.portfolio_project_images?.length} gallery images
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-5">
@@ -623,7 +727,11 @@ export default function AdminPortfolioPage() {
               </div>
 
               <button
-                onClick={() => setShowForm(false)}
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setGalleryImages([]);
+                }}
                 className="rounded-lg p-2 hover:bg-slate-100"
                 aria-label="Close form"
               >
@@ -646,53 +754,6 @@ export default function AdminPortfolioPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-xs font-semibold text-slate-600">
-                    
-                  URL Slug
-                  </label>
-                  <input
-                    value={form.slug}
-                    onChange={(e) => updateField("slug", e.target.value)}
-                    placeholder="business-website"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-blue-500"
-                  />
-                  <p className="mt-1 text-[11px] text-slate-400">
-                    Leave blank to generate it from the title.
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-semibold text-slate-600">
-                  Short Description
-                </label>
-                <textarea
-                  rows={2}
-                  maxLength={500}
-                  value={form.short_description}
-                  onChange={(e) =>
-                    updateField("short_description", e.target.value)
-                  }
-                  placeholder="A brief introduction to this project..."
-                  className="w-full rounded-xl border border-slate-200 p-4 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs font-semibold text-slate-600">
-                  Full Project Description
-                </label>
-                <textarea
-                  rows={5}
-                  value={form.description}
-                  onChange={(e) => updateField("description", e.target.value)}
-                  placeholder="Explain the project, its purpose and the work completed..."
-                  className="w-full rounded-xl border border-slate-200 p-4 text-sm outline-none focus:border-blue-500"
-                />
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-xs font-semibold text-slate-600">
                     Category
@@ -767,6 +828,70 @@ export default function AdminPortfolioPage() {
                     </button>
                   </div>
                 )}
+              </div>
+
+              {/* PROJECT IMAGE GALLERY */}
+              <div>
+                <div className="mb-2">
+                  <label className="block text-xs font-semibold text-slate-600">
+                    Project Image Gallery
+                  </label>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Select multiple images to showcase different parts of
+                    this project. Maximum 30 images, 5 MB each.
+                  </p>
+                </div>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  disabled={uploadingGallery || galleryImages.length >= 30}
+                  onChange={(e) => {
+                    uploadGallery(e.target.files);
+                    e.target.value = "";
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+                />
+
+                {uploadingGallery && (
+                  <p className="mt-3 flex items-center gap-2 text-xs text-blue-600">
+                    <Loader2 size={14} className="animate-spin" />
+                    Uploading gallery images...
+                  </p>
+                )}
+
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {galleryImages.map((image, index) => (
+                    <div
+                      key={`${image}-${index}`}
+                      className="relative overflow-hidden rounded-xl border border-slate-200"
+                    >
+                      <img
+                        src={image}
+                        alt={`Gallery image ${index + 1}`}
+                        className="h-32 w-full object-cover"
+                      />
+
+                      <span className="absolute left-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] text-white">
+                        Image {index + 1}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(index)}
+                        className="absolute right-2 top-2 rounded-full bg-red-600 p-1.5 text-white hover:bg-red-700"
+                        aria-label={`Remove gallery image ${index + 1}`}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-2 text-xs text-slate-500">
+                  {galleryImages.length}/30 gallery images selected.
+                </p>
               </div>
 
               <div>
@@ -849,24 +974,34 @@ export default function AdminPortfolioPage() {
                 </div>
               )}
 
-              <div className="flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end">
+                            <div className="flex flex-col-reverse gap-3 border-t pt-5 sm:flex-row sm:justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
-                  className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                  onClick={() => {
+                    setShowForm(false);
+                    setGalleryImages([]);
+                  }}
+                  disabled={saving || uploading || uploadingGallery}
+                  className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                 >
                   Cancel
                 </button>
 
                 <button
                   type="submit"
-                  disabled={saving || uploading}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#0A1830] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+                  disabled={saving || uploading || uploadingGallery}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#0A1830] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {saving && (
-                    <Loader2 size={16} className="animate-spin" />
+                  {saving ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Saving...
+                    </>
+                  ) : editingId ? (
+                    "Update Project"
+                  ) : (
+                    "Create Project"
                   )}
-                  {editingId ? "Save Changes" : "Create Project"}
                 </button>
               </div>
             </form>
@@ -876,5 +1011,3 @@ export default function AdminPortfolioPage() {
     </main>
   );
 }
-
-         
