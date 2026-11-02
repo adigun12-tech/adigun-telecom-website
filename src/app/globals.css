@@ -1091,3 +1091,39 @@ textarea {
     padding: 28px 23px;
   }
 }
+/* WHATSAPP FLOATING BUTTON */
+.whatsapp-button {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 999px;
+  background: #20b86a;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+  font-size: .86rem;
+  font-weight: 800;
+  transition: .2s ease;
+}
+
+.whatsapp-button:hover {
+  background: #159957;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 480px) {
+  .whatsapp-button {
+    right: 15px;
+    bottom: 15px;
+    padding: 13px;
+    border-radius: 50%;
+  }
+
+  .whatsapp-button span {
+    display: none;
+  }
+}
