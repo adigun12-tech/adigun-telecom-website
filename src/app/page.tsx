@@ -1,6 +1,7 @@
 
 import Link from "next/link";
 import MobileMenu from "@/components/MobileMenu";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import {
   ArrowRight,
   Code2,
@@ -385,6 +386,7 @@ export default function HomePage() {
           <span>Building a smarter digital future.</span>
         </div>
       </footer>
+      <WhatsAppButton />
     </main>
   );
               }
