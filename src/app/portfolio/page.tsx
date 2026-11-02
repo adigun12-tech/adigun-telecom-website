@@ -640,8 +640,7 @@ export default function ProductsPage() {
         }}
       >
         <div className="container">
-          <Sparkles size={35} color="
-"#2879D8" />
+          <Sparkles size={35} color="#2879D8" />
 
           <h2
             style={{
