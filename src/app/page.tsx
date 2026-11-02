@@ -76,7 +76,7 @@ export default function HomePage() {
           </Link>
 
 <nav className="desktop-nav">
-  <a href="#home">Home</a>
+  <Link href="/#home">Home</Link>
   <a href="about">About</a>
   <a href="services">Services</a>
   <a href="products">Products</a>
