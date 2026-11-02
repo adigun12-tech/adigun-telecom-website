@@ -1,4 +1,4 @@
-
+import EnquiryForm from "./EnquiryForm";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -67,6 +67,12 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      {/* PROJECT ENQUIRY FORM */}
+<section className="px-6 py-20">
+  <div className="mx-auto max-w-4xl">
+    <EnquiryForm />
+  </div>
+</section>
 
       {/* CONTACT INFORMATION */}
       <section className="px-6 py-20">
