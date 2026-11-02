@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { LockKeyhole, Mail, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -123,6 +124,14 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
+        <div className="mt-5 text-center">
+  <Link
+    href="/admin/forgot-password"
+    className="text-sm font-semibold text-blue-700 hover:underline"
+  >
+    Forgot your password?
+  </Link>
+</div>
 
         <p className="mt-8 text-center text-xs text-slate-400">
           © {new Date().getFullYear()} Adigun Telecom
