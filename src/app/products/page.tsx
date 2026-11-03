@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MobileMenu from "@/components/MobileMenu";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
 import {
   ArrowRight,
@@ -100,111 +101,44 @@ export default async function ProductsPage() {
 
   return (
     <main>
-      {/* HEADER */}
-      <header
-        style={{
-          background: "#ffffff",
-          borderBottom: "1px solid #e5ebf3",
-          position: "relative",
-          zIndex: 20,
-        }}
-      >
-        <div
-          className="container"
-          style={{
-            minHeight: "82px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "24px",
-            flexWrap: "wrap",
-            paddingTop: "12px",
-            paddingBottom: "12px",
-          }}
-        >
+      {/* PREMIUM RESPONSIVE HEADER */}
+      <header className="site-header">
+        <div className="container nav-container">
           <Link
             href="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textDecoration: "none",
-            }}
+            className="brand"
+            aria-label="Adigun Telecom Home"
           >
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt="Adigun Telecom"
-                style={{
-                  height: "52px",
-                  width: "auto",
-                  maxWidth: "190px",
-                  objectFit: "contain",
-                }}
               />
             ) : (
-              <span
-                style={{
-                  color: "#0A1830",
-                  fontSize: "1.35rem",
-                  fontWeight: 900,
-                  letterSpacing: "-.5px",
-                }}
-              >
-                ADIGUN TELECOM
-              </span>
+              <span className="brand-mark">A</span>
             )}
           </Link>
 
-          <nav
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "22px",
-              flexWrap: "wrap",
-              fontSize: ".9rem",
-              fontWeight: 700,
-            }}
-          >
-            <Link href="/" style={{ color: "#334155", textDecoration: "none" }}>
-              Home
-            </Link>
-
-            <Link href="/about" style={{ color: "#334155", textDecoration: "none" }}>
-              About
-            </Link>
-
-            <Link href="/services" style={{ color: "#334155", textDecoration: "none" }}>
-              Services
-            </Link>
-
+          <nav className="desktop-nav">
+            <Link href="/">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
             <Link
               href="/products"
-              style={{
-                color: "#2879D8",
-                textDecoration: "none",
-              }}
+              style={{ color: "#2879D8" }}
+              aria-current="page"
             >
               Products
             </Link>
-
-            <Link href="/portfolio" style={{ color: "#334155", textDecoration: "none" }}>
-              Portfolio
-            </Link>
-
-            <Link
-              href="/#contact"
-              className="primary-button"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "11px 20px",
-              }}
-            >
-              Contact Us
-            </Link>
+            <Link href="/portfolio">Portfolio</Link>
           </nav>
+
+          <MobileMenu />
+
+          <Link href="/#contact" className="nav-cta">
+            Contact Us
+            <ArrowRight size={16} />
+          </Link>
         </div>
       </header>
 
@@ -623,7 +557,11 @@ export default async function ProductsPage() {
 
                 <Link
                   href="/#contact"
-                  style={{ color: "#7dbbff", textDecoration: "none", fontWeight: 700 }}
+                  style={{
+                    color: "#7dbbff",
+                    textDecoration: "none",
+                    fontWeight: 700,
+                  }}
                 >
                   Send an Enquiry <ArrowRight size={15} />
                 </Link>
@@ -646,4 +584,4 @@ export default async function ProductsPage() {
       </footer>
     </main>
   );
-                  }
+          }
