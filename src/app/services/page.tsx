@@ -1,5 +1,5 @@
-
 import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabase-server-admin";
 import {
   ArrowRight,
   Code2,
@@ -10,6 +10,13 @@ import {
   Lightbulb,
   CheckCircle2,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+type LogoSettings = {
+  logoUrl?: string;
+  logoLightUrl?: string;
+};
 
 const services = [
   {
@@ -92,16 +99,87 @@ const services = [
   },
 ];
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  let logoUrl = "";
+  let logoLightUrl = "";
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("website_settings")
+      .select("settings")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Services page logo settings error:", error);
+    } else if (data?.settings) {
+      const settings = data.settings as LogoSettings;
+
+      logoUrl =
+        typeof settings.logoUrl === "string"
+          ? settings.logoUrl
+          : "";
+
+      logoLightUrl =
+        typeof settings.logoLightUrl === "string"
+          ? settings.logoLightUrl
+          : "";
+    }
+  } catch (error) {
+    console.error("Unable to load Services page logos:", error);
+  }
+
   return (
     <main>
+      <header className="site-header">
+        <div className="container nav-container">
+          <Link
+            href="/"
+            className="brand"
+            aria-label="Adigun Telecom Home"
+          >
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : (
+              <>
+                <span className="brand-mark">A</span>
+                <span>
+                  <strong>ADIGUN</strong>
+                  <small>TELECOM</small>
+                </span>
+              </>
+            )}
+          </Link>
+
+          <nav className="desktop-nav">
+            <Link href="/#home">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/products">Products</Link>
+            <Link href="/portfolio">Portfolio</Link>
+            <Link href="/contact">Contact</Link>
+          </nav>
+
+          <Link href="/contact" className="nav-cta">
+            Let's Talk <ArrowRight size={16} />
+          </Link>
+        </div>
+      </header>
+
       <section
         className="section"
         style={{ background: "#0A1830", color: "#fff" }}
       >
         <div
           className="container"
-          style={{ paddingTop: "65px", paddingBottom: "65px" }}
+          style={{
+            paddingTop: "65px",
+            paddingBottom: "65px",
+          }}
         >
           <span className="section-label">WHAT WE DO</span>
 
@@ -135,14 +213,16 @@ export default function ServicesPage() {
           <Link
             href="/#contact"
             className="primary-button"
-            style={{ marginTop: "30px", display: "inline-flex" }}
+            style={{
+              marginTop: "30px",
+              display: "inline-flex",
+            }}
           >
             Discuss a Project <ArrowRight size={18} />
           </Link>
         </div>
       </section>
-
-      <section className="section">
+            <section className="section">
         <div className="container">
           <span className="section-label">OUR EXPERTISE</span>
 
@@ -159,7 +239,8 @@ export default function ServicesPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(260px, 1fr))",
               gap: "24px",
               marginTop: "45px",
             }}
@@ -185,6 +266,7 @@ export default function ServicesPage() {
                     }}
                   >
                     <Icon size={34} color="#2879D8" />
+
                     <span
                       style={{
                         color: "#aab6c5",
@@ -238,7 +320,10 @@ export default function ServicesPage() {
                         <CheckCircle2
                           size={17}
                           color="#2879D8"
-                          style={{ flexShrink: 0, marginTop: "2px" }}
+                          style={{
+                            flexShrink: 0,
+                            marginTop: "2px",
+                          }}
                         />
                         {feature}
                       </div>
@@ -260,7 +345,9 @@ export default function ServicesPage() {
         }}
       >
         <div className="container">
-          <span className="section-label">HAVE A PROJECT IN MIND?</span>
+          <span className="section-label">
+            HAVE A PROJECT IN MIND?
+          </span>
 
           <h2
             style={{
@@ -271,7 +358,12 @@ export default function ServicesPage() {
             Let's turn your idea into a solution.
           </h2>
 
-          <p style={{ color: "#c4d0df", marginTop: "18px" }}>
+          <p
+            style={{
+              color: "#c4d0df",
+              marginTop: "18px",
+            }}
+          >
             Tell us what you want to achieve. Let's explore
             the possibilities together.
           </p>
@@ -279,12 +371,68 @@ export default function ServicesPage() {
           <Link
             href="/#contact"
             className="primary-button"
-            style={{ marginTop: "28px", display: "inline-flex" }}
+            style={{
+              marginTop: "28px",
+              display: "inline-flex",
+            }}
           >
             Contact Adigun Telecom <ArrowRight size={18} />
           </Link>
         </div>
       </section>
+
+      <footer className="footer">
+        <div className="container footer-main">
+          <Link
+            href="/"
+            className="brand footer-brand"
+            aria-label="Adigun Telecom Home"
+          >
+            {logoLightUrl ? (
+              <img
+                src={logoLightUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : (
+              <>
+                <span className="brand-mark">A</span>
+                <span>
+                  <strong>ADIGUN</strong>
+                  <small>TELECOM</small>
+                </span>
+              </>
+            )}
+          </Link>
+
+          <p>Building Technology. Empowering Progress.</p>
+
+          <div className="footer-links">
+            <Link href="/#home">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/products">Products</Link>
+            <Link href="/portfolio">Portfolio</Link>
+            <Link href="/contact">Contact</Link>
+          </div>
+        </div>
+
+        <div className="container footer-bottom">
+          <span>
+            © {new Date().getFullYear()} Adigun Telecom.
+          </span>
+
+          <span>
+            Building a smarter digital future.
+          </span>
+        </div>
+      </footer>
     </main>
   );
-            }
+}
