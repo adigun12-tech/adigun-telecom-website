@@ -128,12 +128,13 @@ export default function AdminOverviewPage() {
       icon: Globe,
       href: "/admin/website-content",
     },
-    {
-      title: "Media Library",
-      description:
-        "Organise website images and project media.",
-      icon: ImageIcon,
-    },
+{
+  title: "Media Library",
+  description:
+    "Organise website images and project media.",
+  icon: ImageIcon,
+  href: "/admin/media",
+},
     {
       title: "Administrator Management",
       description:
