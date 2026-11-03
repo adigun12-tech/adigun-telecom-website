@@ -85,7 +85,7 @@ export default function MobileMenu() {
             </div>
 
             <div className="mobile-menu-links">
-              {links.map((link, index) => {
+              {links.map((link) => {
                 const isActive =
                   link.href === "/#home"
                     ? pathname === "/"
@@ -99,10 +99,6 @@ export default function MobileMenu() {
                     aria-current={isActive ? "page" : undefined}
                     className={isActive ? "active" : ""}
                   >
-                    <span className="mobile-link-number">
-                      0{index + 1}
-                    </span>
-
                     <span className="mobile-link-label">
                       {link.label}
                     </span>
