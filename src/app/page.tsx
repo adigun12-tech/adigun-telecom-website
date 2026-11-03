@@ -2,6 +2,9 @@
 import Link from "next/link";
 import MobileMenu from "@/components/MobileMenu";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import MediaSlideshow, {
+  type MediaSlideshowImage,
+} from "@/components/MediaSlideshow";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
 import {
   ArrowRight,
@@ -53,6 +56,37 @@ type WebsiteContent = {
     phone2: string;
     email: string;
   };
+};
+
+type SlideshowSettings = {
+  enabled: boolean;
+  mediaIds: string[];
+  interval: number;
+  transition: "fade" | "slide";
+  showArrows: boolean;
+  showDots: boolean;
+};
+
+type HomepageSlideshows = {
+  hero: SlideshowSettings;
+  portfolio: SlideshowSettings;
+};
+
+const defaultSlideshow: SlideshowSettings = {
+  enabled: false,
+  mediaIds: [],
+  interval: 5,
+  transition: "fade",
+  showArrows: true,
+  showDots: true,
+};
+
+const defaultSlideshows: HomepageSlideshows = {
+  hero: { ...defaultSlideshow },
+  portfolio: {
+    ...defaultSlideshow,
+    transition: "slide",
+  },
 };
 
 const defaultContent: WebsiteContent = {
@@ -165,6 +199,26 @@ function mergeContent(saved: any): WebsiteContent {
   };
 }
 
+function normaliseSlideshows(saved: any): HomepageSlideshows {
+  return {
+    hero: {
+      ...defaultSlideshow,
+      ...saved?.hero,
+      mediaIds: Array.isArray(saved?.hero?.mediaIds)
+        ? saved.hero.mediaIds
+        : [],
+    },
+    portfolio: {
+      ...defaultSlideshow,
+      transition: "slide",
+      ...saved?.portfolio,
+      mediaIds: Array.isArray(saved?.portfolio?.mediaIds)
+        ? saved.portfolio.mediaIds
+        : [],
+    },
+  };
+}
+
 function phoneLink(phone: string) {
   return `tel:${phone.replace(/[^\d+]/g, "")}`;
 }
@@ -180,7 +234,12 @@ const serviceIcons = [
 
 export default async function HomePage() {
   let content = defaultContent;
+  let slideshows = defaultSlideshows;
 
+  let heroSlides: MediaSlideshowImage[] = [];
+  let portfolioSlides: MediaSlideshowImage[] = [];
+
+  // Load editable website content and slideshow settings.
   try {
     const { data, error } = await supabaseAdmin
       .from("website_content")
@@ -192,9 +251,56 @@ export default async function HomePage() {
       console.error("Homepage content error:", error);
     } else if (data?.content) {
       content = mergeContent(data.content);
+      slideshows = normaliseSlideshows(data.content.slideshows);
     }
   } catch (error) {
     console.error("Unable to load homepage content:", error);
+  }
+
+  // Load selected slideshow images in their saved order.
+  try {
+    const selectedIds = [
+      ...(slideshows.hero.enabled ? slideshows.hero.mediaIds : []),
+      ...(slideshows.portfolio.enabled
+        ? slideshows.portfolio.mediaIds
+        : []),
+    ];
+
+    const uniqueIds = [...new Set(selectedIds)];
+
+    if (uniqueIds.length > 0) {
+      const { data: media, error } = await supabaseAdmin
+        .from("website_media")
+        .select("id, file_url, file_name, alt_text")
+        .in("id", uniqueIds);
+
+      if (error) {
+        console.error("Homepage slideshow media error:", error);
+      } else if (media) {
+        const mediaMap = new Map(
+          media.map((item) => [item.id, item])
+        );
+
+        const orderedMedia = (ids: string[]): MediaSlideshowImage[] =>
+          ids
+            .map((id) => mediaMap.get(id))
+            .filter(
+              (item): item is NonNullable<typeof item> =>
+                Boolean(item)
+            )
+            .map((item) => ({
+              id: item.id,
+              file_url: item.file_url,
+              file_name: item.file_name,
+              alt_text: item.alt_text || "",
+            }));
+
+        heroSlides = orderedMedia(slideshows.hero.mediaIds);
+        portfolioSlides = orderedMedia(slideshows.portfolio.mediaIds);
+      }
+    }
+  } catch (error) {
+    console.error("Unable to load homepage slideshow images:", error);
   }
 
   const services = content.services.items;
@@ -265,27 +371,41 @@ export default async function HomePage() {
           </div>
 
           <div className="hero-visual">
-            <div className="visual-orbit orbit-one" />
-            <div className="visual-orbit orbit-two" />
+            {slideshows.hero.enabled && heroSlides.length > 0 ? (
+              <MediaSlideshow
+                slides={heroSlides}
+                enabled={slideshows.hero.enabled}
+                interval={slideshows.hero.interval}
+                transition={slideshows.hero.transition}
+                showArrows={slideshows.hero.showArrows}
+                showDots={slideshows.hero.showDots}
+                className="h-full min-h-[320px] w-full rounded-2xl"
+              />
+            ) : (
+              <>
+                <div className="visual-orbit orbit-one" />
+                <div className="visual-orbit orbit-two" />
 
-            <div className="visual-core">
-              <span>A</span>
-              <small>
-                ADIGUN
-                <br />
-                TECHNOLOGY
-              </small>
-            </div>
+                <div className="visual-core">
+                  <span>A</span>
+                  <small>
+                    ADIGUN
+                    <br />
+                    TECHNOLOGY
+                  </small>
+                </div>
 
-            <div className="floating-card card-top">
-              <Code2 size={20} />
-              <span>Digital Innovation</span>
-            </div>
+                <div className="floating-card card-top">
+                  <Code2 size={20} />
+                  <span>Digital Innovation</span>
+                </div>
 
-            <div className="floating-card card-bottom">
-              <Globe2 size={20} />
-              <span>Built for Africa</span>
-            </div>
+                <div className="floating-card card-bottom">
+                  <Globe2 size={20} />
+                  <span>Built for Africa</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -366,7 +486,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-      
+
       <section className="section portfolio-section" id="portfolio">
         <div className="container">
           <div className="portfolio-heading">
@@ -388,20 +508,33 @@ export default async function HomePage() {
 
           <article className="portfolio-card">
             <div className="portfolio-art">
-              <div className="portfolio-screen">
-                <div className="portfolio-screen-top">
-                  <span>TRUST FOUNDATION SCHOOL</span>
-                  <span>EDUCATION PLATFORM</span>
-                </div>
+              {slideshows.portfolio.enabled &&
+              portfolioSlides.length > 0 ? (
+                <MediaSlideshow
+                  slides={portfolioSlides}
+                  enabled={slideshows.portfolio.enabled}
+                  interval={slideshows.portfolio.interval}
+                  transition={slideshows.portfolio.transition}
+                  showArrows={slideshows.portfolio.showArrows}
+                  showDots={slideshows.portfolio.showDots}
+                  className="h-full min-h-[280px] w-full"
+                />
+              ) : (
+                <div className="portfolio-screen">
+                  <div className="portfolio-screen-top">
+                    <span>TRUST FOUNDATION SCHOOL</span>
+                    <span>EDUCATION PLATFORM</span>
+                  </div>
 
-                <div className="portfolio-screen-body">
-                  <GraduationCap size={48} />
-                  <strong>Digital School Management</strong>
-                  <span>
-                    Website • School Portal • Digital Administration
-                  </span>
+                  <div className="portfolio-screen-body">
+                    <GraduationCap size={48} />
+                    <strong>Digital School Management</strong>
+                    <span>
+                      Website • School Portal • Digital Administration
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="portfolio-info">
@@ -530,9 +663,7 @@ export default async function HomePage() {
             {content.contact.label}
           </span>
 
-          <h2>
-            {content.contact.heading}
-          </h2>
+          <h2>{content.contact.heading}</h2>
 
           <p>{content.contact.description}</p>
 
@@ -542,10 +673,7 @@ export default async function HomePage() {
               <ArrowRight size={18} />
             </a>
 
-            <a
-              href={phone2Link}
-              className="contact-number"
-            >
+            <a href={phone2Link} className="contact-number">
               {content.contact.phone2}
             </a>
 
@@ -563,7 +691,7 @@ export default async function HomePage() {
         <div className="container footer-main">
           <Link href="/" className="brand footer-brand">
             <span className="brand-mark">A</span>
-            <span>
+                        <span>
               <strong>ADIGUN</strong>
               <small>TELECOM</small>
             </span>
@@ -594,4 +722,4 @@ export default async function HomePage() {
     </main>
   );
 }
-
+       
