@@ -1,5 +1,7 @@
 import EnquiryForm from "./EnquiryForm";
 import Link from "next/link";
+import Image from "next/image";
+import { supabaseAdmin } from "@/lib/supabase-server-admin";
 import {
   ArrowRight,
   Mail,
@@ -11,7 +13,45 @@ import {
   Headphones,
 } from "lucide-react";
 
-export default function ContactPage() {
+export const dynamic = "force-dynamic";
+
+type WebsiteSettings = {
+  logoUrl?: string;
+  logoLightUrl?: string;
+};
+
+export default async function ContactPage() {
+  let logoUrl = "";
+  let logoLightUrl = "";
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("website_settings")
+      .select("settings")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Contact page logo settings error:", error);
+    } else {
+      const settings = (data?.settings || {}) as WebsiteSettings;
+
+      logoUrl =
+        typeof settings.logoUrl === "string"
+          ? settings.logoUrl
+          : "";
+
+      logoLightUrl =
+        typeof settings.logoLightUrl === "string"
+          ? settings.logoLightUrl
+          : "";
+    }
+  } catch (error) {
+    console.error("Unable to load contact page logos:", error);
+  }
+
+  const footerLogo = logoLightUrl || logoUrl;
+
   const phoneNumbers = [
     { number: "07042723692", link: "+2347042723692" },
     { number: "09078440739", link: "+2349078440739" },
@@ -67,12 +107,13 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
       {/* PROJECT ENQUIRY FORM */}
-<section className="px-6 py-20">
-  <div className="mx-auto max-w-4xl">
-    <EnquiryForm />
-  </div>
-</section>
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-4xl">
+          <EnquiryForm />
+        </div>
+      </section>
 
       {/* CONTACT INFORMATION */}
       <section className="px-6 py-20">
@@ -159,8 +200,7 @@ export default function ContactPage() {
                 Start a Conversation →
               </a>
             </div>
-
-            {/* LOCATION */}
+                        {/* LOCATION */}
             <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
               <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                 <MapPin size={26} />
@@ -236,9 +276,21 @@ export default function ContactPage() {
       <footer className="border-t border-slate-200 bg-white px-6 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-5 text-center md:flex-row md:text-left">
           <div>
-            <p className="text-lg font-extrabold text-[#0A1830]">
-              ADIGUN <span className="text-blue-600">TELECOM</span>
-            </p>
+            {footerLogo ? (
+              <Image
+                src={footerLogo}
+                alt="Adigun Telecom"
+                width={190}
+                height={65}
+                className="h-auto max-h-16 w-auto max-w-[190px] object-contain"
+                unoptimized
+              />
+            ) : (
+              <p className="text-lg font-extrabold text-[#0A1830]">
+                ADIGUN <span className="text-blue-600">TELECOM</span>
+              </p>
+            )}
+
             <p className="mt-1 text-sm text-slate-500">
               Building Technology. Empowering Progress.
             </p>
@@ -259,4 +311,4 @@ export default function ContactPage() {
       </footer>
     </main>
   );
-      }
+}
