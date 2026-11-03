@@ -17,6 +17,7 @@ import {
   Globe2,
   CheckCircle2,
 } from "lucide-react";
+export const dynamic = "force-dynamic";
 
 type Service = {
   title: string;
