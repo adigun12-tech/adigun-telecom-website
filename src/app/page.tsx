@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import MobileMenu from "@/components/MobileMenu";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -17,6 +16,7 @@ import {
   Globe2,
   CheckCircle2,
 } from "lucide-react";
+
 export const dynamic = "force-dynamic";
 
 type Service = {
@@ -71,6 +71,11 @@ type SlideshowSettings = {
 type HomepageSlideshows = {
   hero: SlideshowSettings;
   portfolio: SlideshowSettings;
+};
+
+type WebsiteLogoSettings = {
+  logoUrl?: string;
+  logoLightUrl?: string;
 };
 
 const defaultSlideshow: SlideshowSettings = {
@@ -237,8 +242,39 @@ export default async function HomePage() {
   let content = defaultContent;
   let slideshows = defaultSlideshows;
 
+  let logoUrl = "";
+  let logoLightUrl = "";
+
   let heroSlides: MediaSlideshowImage[] = [];
   let portfolioSlides: MediaSlideshowImage[] = [];
+
+  // Load website logo settings.
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("website_settings")
+      .select("settings")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Homepage logo settings error:", error);
+    } else if (data?.settings) {
+      const settings =
+        data.settings as WebsiteLogoSettings;
+
+      logoUrl =
+        typeof settings.logoUrl === "string"
+          ? settings.logoUrl
+          : "";
+
+      logoLightUrl =
+        typeof settings.logoLightUrl === "string"
+          ? settings.logoLightUrl
+          : "";
+    }
+  } catch (error) {
+    console.error("Unable to load homepage logos:", error);
+  }
 
   // Load editable website content and slideshow settings.
   try {
@@ -252,7 +288,9 @@ export default async function HomePage() {
       console.error("Homepage content error:", error);
     } else if (data?.content) {
       content = mergeContent(data.content);
-      slideshows = normaliseSlideshows(data.content.slideshows);
+      slideshows = normaliseSlideshows(
+        data.content.slideshows
+      );
     }
   } catch (error) {
     console.error("Unable to load homepage content:", error);
@@ -261,7 +299,9 @@ export default async function HomePage() {
   // Load selected slideshow images in their saved order.
   try {
     const selectedIds = [
-      ...(slideshows.hero.enabled ? slideshows.hero.mediaIds : []),
+      ...(slideshows.hero.enabled
+        ? slideshows.hero.mediaIds
+        : []),
       ...(slideshows.portfolio.enabled
         ? slideshows.portfolio.mediaIds
         : []),
@@ -276,13 +316,18 @@ export default async function HomePage() {
         .in("id", uniqueIds);
 
       if (error) {
-        console.error("Homepage slideshow media error:", error);
+        console.error(
+          "Homepage slideshow media error:",
+          error
+        );
       } else if (media) {
         const mediaMap = new Map(
           media.map((item) => [item.id, item])
         );
 
-        const orderedMedia = (ids: string[]): MediaSlideshowImage[] =>
+        const orderedMedia = (
+          ids: string[]
+        ): MediaSlideshowImage[] =>
           ids
             .map((id) => mediaMap.get(id))
             .filter(
@@ -296,12 +341,20 @@ export default async function HomePage() {
               alt_text: item.alt_text || "",
             }));
 
-        heroSlides = orderedMedia(slideshows.hero.mediaIds);
-        portfolioSlides = orderedMedia(slideshows.portfolio.mediaIds);
+        heroSlides = orderedMedia(
+          slideshows.hero.mediaIds
+        );
+
+        portfolioSlides = orderedMedia(
+          slideshows.portfolio.mediaIds
+        );
       }
     }
   } catch (error) {
-    console.error("Unable to load homepage slideshow images:", error);
+    console.error(
+      "Unable to load homepage slideshow images:",
+      error
+    );
   }
 
   const services = content.services.items;
@@ -313,12 +366,26 @@ export default async function HomePage() {
     <main>
       <header className="site-header">
         <div className="container nav-container">
-          <Link href="/" className="brand">
-            <span className="brand-mark">A</span>
-            <span>
-              <strong>ADIGUN</strong>
-              <small>TELECOM</small>
-            </span>
+          <Link
+            href="/"
+            className="brand"
+            aria-label="Adigun Telecom Home"
+          >
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : (
+              <>
+                <span className="brand-mark">A</span>
+                <span>
+                  <strong>ADIGUN</strong>
+                  <small>TELECOM</small>
+                </span>
+              </>
+            )}
           </Link>
 
           <nav className="desktop-nav">
@@ -367,12 +434,15 @@ export default async function HomePage() {
 
             <div className="hero-note">
               <ShieldCheck size={17} />
-              <span>Technology built around real-world needs.</span>
+              <span>
+                Technology built around real-world needs.
+              </span>
             </div>
           </div>
 
           <div className="hero-visual">
-            {slideshows.hero.enabled && heroSlides.length > 0 ? (
+            {slideshows.hero.enabled &&
+            heroSlides.length > 0 ? (
               <MediaSlideshow
                 slides={heroSlides}
                 enabled={slideshows.hero.enabled}
@@ -416,8 +486,7 @@ export default async function HomePage() {
           <span>PROGRESS</span>
         </div>
       </section>
-
-      <section className="section" id="about">
+            <section className="section" id="about">
         <div className="container about-grid">
           <div>
             <span className="section-label">
@@ -440,7 +509,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section services-section" id="services">
+      <section
+        className="section services-section"
+        id="services"
+      >
         <div className="container">
           <div className="section-heading">
             <div>
@@ -488,7 +560,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section portfolio-section" id="portfolio">
+      <section
+        className="section portfolio-section"
+        id="portfolio"
+      >
         <div className="container">
           <div className="portfolio-heading">
             <div>
@@ -502,8 +577,8 @@ export default async function HomePage() {
             </div>
 
             <p className="section-description">
-              Exploring practical digital solutions through real-world
-              projects and continuous innovation.
+              Exploring practical digital solutions through
+              real-world projects and continuous innovation.
             </p>
           </div>
 
@@ -529,9 +604,12 @@ export default async function HomePage() {
 
                   <div className="portfolio-screen-body">
                     <GraduationCap size={48} />
-                    <strong>Digital School Management</strong>
+                    <strong>
+                      Digital School Management
+                    </strong>
                     <span>
-                      Website • School Portal • Digital Administration
+                      Website • School Portal • Digital
+                      Administration
                     </span>
                   </div>
                 </div>
@@ -546,9 +624,10 @@ export default async function HomePage() {
               <h3>Trust Foundation School</h3>
 
               <p>
-                A digital education project bringing together a school
-                website and school management portal to support
-                administration, academic records and communication.
+                A digital education project bringing together
+                a school website and school management portal
+                to support administration, academic records
+                and communication.
               </p>
 
               <span className="portfolio-status">
@@ -559,7 +638,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section product-section" id="products">
+      <section
+        className="section product-section"
+        id="products"
+      >
         <div className="container product-grid">
           <div className="product-visual">
             <div className="product-window">
@@ -600,9 +682,9 @@ export default async function HomePage() {
             </h2>
 
             <p>
-              A school management platform being developed to
-              simplify academic administration and connect schools,
-              teachers, parents and students.
+              A school management platform being developed
+              to simplify academic administration and connect
+              schools, teachers, parents and students.
             </p>
 
             <ul className="product-features">
@@ -649,7 +731,10 @@ export default async function HomePage() {
 
           <div className="values-grid">
             {values.map((value, index) => (
-              <div className="value-item" key={`${value}-${index}`}>
+              <div
+                className="value-item"
+                key={`${value}-${index}`}
+              >
                 <CheckCircle2 size={19} />
                 <span>{value}</span>
               </div>
@@ -669,12 +754,18 @@ export default async function HomePage() {
           <p>{content.contact.description}</p>
 
           <div className="contact-actions">
-            <a href={phone1Link} className="primary-button">
+            <a
+              href={phone1Link}
+              className="primary-button"
+            >
               Call {content.contact.phone1}
               <ArrowRight size={18} />
             </a>
 
-            <a href={phone2Link} className="contact-number">
+            <a
+              href={phone2Link}
+              className="contact-number"
+            >
               {content.contact.phone2}
             </a>
 
@@ -690,12 +781,32 @@ export default async function HomePage() {
 
       <footer className="footer">
         <div className="container footer-main">
-          <Link href="/" className="brand footer-brand">
-            <span className="brand-mark">A</span>
-                        <span>
-              <strong>ADIGUN</strong>
-              <small>TELECOM</small>
-            </span>
+          <Link
+            href="/"
+            className="brand footer-brand"
+            aria-label="Adigun Telecom Home"
+          >
+            {logoLightUrl ? (
+              <img
+                src={logoLightUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : (
+              <>
+                <span className="brand-mark">A</span>
+                <span>
+                  <strong>ADIGUN</strong>
+                  <small>TELECOM</small>
+                </span>
+              </>
+            )}
           </Link>
 
           <p>Building Technology. Empowering Progress.</p>
@@ -715,7 +826,9 @@ export default async function HomePage() {
             © {new Date().getFullYear()} Adigun Telecom.
           </span>
 
-          <span>Building a smarter digital future.</span>
+          <span>
+            Building a smarter digital future.
+          </span>
         </div>
       </footer>
 
@@ -723,4 +836,3 @@ export default async function HomePage() {
     </main>
   );
 }
-       
