@@ -121,34 +121,31 @@ export default function AdminOverviewPage() {
     enquiries.filter((item) => item.status === status).length;
 
   const upcomingSections = [
-    {
-      title: "Website Content",
-      description:
-        "Manage homepage, About, Services and Contact.",
-      icon: Globe,
-      href: "/admin/website-content",
-    },
-{
-  title: "Media Library",
-  description:
-    "Organise website images and project media.",
-  icon: ImageIcon,
-  href: "/admin/media",
-},
-    {
-      title: "Administrator Management",
-      description:
-        "Manage administrator accounts and permissions.",
-      icon: Users,
-    },
-    {
-      title: "Website Settings",
-      description:
-        "Manage website configuration and preferences.",
-      icon: Settings,
-    },
-  ];
-
+  {
+    title: "Website Content",
+    description: "Manage homepage, About, Services and Contact.",
+    icon: Globe,
+    href: "/admin/website-content",
+  },
+  {
+    title: "Media Library",
+    description: "Organise website images and project media.",
+    icon: ImageIcon,
+    href: "/admin/media",
+  },
+  {
+    title: "Administrator Management",
+    description: "Manage administrator accounts and permissions.",
+    icon: Users,
+    href: "/admin/administrators",
+  },
+  {
+    title: "Website Settings",
+    description: "Manage company information, SEO and preferences.",
+    icon: Settings,
+    href: "/admin/settings",
+  },
+];
   return (
     <main className="min-h-screen bg-[#F4F7FB]">
       <header className="bg-[#0A1830] px-5 py-5 text-white sm:px-8">
