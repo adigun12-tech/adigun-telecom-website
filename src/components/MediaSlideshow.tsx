@@ -104,7 +104,7 @@ export default function MediaSlideshow({
                   slide.file_name ||
                   "Adigun Telecom slideshow image"
                 }
-                className={`h-full w-full object-cover ${imageClassName}`}
+                className={`h-full w-full object-contain ${imageClassName}`}
                 loading={index === 0 ? "eager" : "lazy"}
                 draggable={false}
               />
