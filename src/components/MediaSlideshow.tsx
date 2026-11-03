@@ -21,6 +21,7 @@ type MediaSlideshowProps = {
   transition?: "fade" | "slide";
   showArrows?: boolean;
   showDots?: boolean;
+  imageFit?: "contain" | "cover";
   className?: string;
   imageClassName?: string;
 };
@@ -32,6 +33,7 @@ export default function MediaSlideshow({
   transition = "fade",
   showArrows = true,
   showDots = true,
+  imageFit = "contain",
   className = "",
   imageClassName = "",
 }: MediaSlideshowProps) {
@@ -110,7 +112,11 @@ export default function MediaSlideshow({
                   slide.file_name ||
                   "Adigun Telecom slideshow image"
                 }
-                className={`block h-full w-full object-contain object-center ${imageClassName}`}
+                className={`block h-full w-full ${
+                  imageFit === "cover"
+                    ? "object-cover"
+                    : "object-contain"
+                } object-center ${imageClassName}`}
                 loading={index === 0 ? "eager" : "lazy"}
                 draggable={false}
               />
