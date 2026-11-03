@@ -57,6 +57,12 @@ export default function MediaSlideshow({
     return () => window.clearInterval(timer);
   }, [shouldAutoplay, interval, slides.length]);
 
+  useEffect(() => {
+    if (activeIndex >= slides.length) {
+      setActiveIndex(0);
+    }
+  }, [activeIndex, slides.length]);
+
   if (!slides.length) return null;
 
   const goToPrevious = () => {
@@ -71,11 +77,11 @@ export default function MediaSlideshow({
 
   return (
     <div
-      className={`relative isolate h-full w-full overflow-hidden rounded-2xl border border-white/15 bg-slate-950 shadow-2xl ${className}`}
+      className={`relative isolate aspect-[9/16] w-full overflow-hidden rounded-2xl border border-white/15 bg-[#0A1830] shadow-2xl ${className}`}
       aria-roledescription="carousel"
       aria-label="Image slideshow"
     >
-      <div className="relative h-full w-full overflow-hidden">
+      <div className="absolute inset-0 h-full w-full overflow-hidden">
         {slides.map((slide, index) => {
           const isActive = index === safeIndex;
 
@@ -83,7 +89,7 @@ export default function MediaSlideshow({
             <div
               key={slide.id}
               className={[
-                "absolute inset-0 h-full w-full",
+                "absolute inset-0 flex h-full w-full items-center justify-center",
                 "transition-all duration-700 ease-in-out",
                 transition === "fade"
                   ? isActive
@@ -104,7 +110,7 @@ export default function MediaSlideshow({
                   slide.file_name ||
                   "Adigun Telecom slideshow image"
                 }
-                className={`h-full w-full object-contain ${imageClassName}`}
+                className={`block h-full w-full object-contain object-center ${imageClassName}`}
                 loading={index === 0 ? "eager" : "lazy"}
                 draggable={false}
               />
