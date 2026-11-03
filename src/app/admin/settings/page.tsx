@@ -11,9 +11,11 @@ import {
   Loader2,
   RefreshCw,
   Globe,
-  Phone,
   Share2,
   Search,
+  ImagePlus,
+  Upload,
+  X,
 } from "lucide-react";
 
 type SettingsData = {
@@ -31,6 +33,10 @@ type SettingsData = {
   websiteTitle: string;
   metaDescription: string;
   maintenanceMode: boolean;
+  logoUrl: string;
+  logoPath: string;
+  logoLightUrl: string;
+  logoLightPath: string;
 };
 
 const initialSettings: SettingsData = {
@@ -49,6 +55,10 @@ const initialSettings: SettingsData = {
   metaDescription:
     "Adigun Telecom builds innovative digital solutions for businesses, schools and organisations.",
   maintenanceMode: false,
+  logoUrl: "",
+  logoPath: "",
+  logoLightUrl: "",
+  logoLightPath: "",
 };
 
 export default function WebsiteSettingsPage() {
@@ -57,6 +67,8 @@ export default function WebsiteSettingsPage() {
   const [settings, setSettings] = useState<SettingsData>(initialSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingPrimary, setUploadingPrimary] = useState(false);
+  const [uploadingLight, setUploadingLight] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
@@ -133,6 +145,91 @@ export default function WebsiteSettingsPage() {
     }));
   }
 
+  async function uploadLogo(
+    file: File,
+    variant: "primary" | "light"
+  ) {
+    setError("");
+    setSuccess("");
+
+    const setUploading =
+      variant === "primary" ? setUploadingPrimary : setUploadingLight;
+
+    setUploading(true);
+
+    try {
+      const headers = await getHeaders();
+      if (!headers) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("variant", variant);
+
+      const response = await fetch("/api/admin/website-settings/logo", {
+        method: "POST",
+        headers: {
+          Authorization: headers.Authorization,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.status === 401) {
+        await supabaseBrowser.auth.signOut();
+        router.replace("/admin/login");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(result.error || "Logo upload failed.");
+      }
+
+      if (variant === "primary") {
+        setSettings((current) => ({
+          ...current,
+          logoUrl: result.logo.url,
+          logoPath: result.logo.path,
+        }));
+      } else {
+        setSettings((current) => ({
+          ...current,
+          logoLightUrl: result.logo.url,
+          logoLightPath: result.logo.path,
+        }));
+      }
+
+      setSuccess(
+        `${variant === "primary" ? "Primary" : "Light"} logo uploaded. Click Save Settings to apply it.`
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to upload logo."
+      );
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeLogo(variant: "primary" | "light") {
+    if (variant === "primary") {
+      setSettings((current) => ({
+        ...current,
+        logoUrl: "",
+        logoPath: "",
+      }));
+    } else {
+      setSettings((current) => ({
+        ...current,
+        logoLightUrl: "",
+        logoLightPath: "",
+      }));
+    }
+
+    setSuccess("Logo removal prepared. Click Save Settings to apply it.");
+    setError("");
+  }
+
   async function saveSettings(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -191,6 +288,100 @@ export default function WebsiteSettingsPage() {
     </label>
   );
 
+  function LogoUploader({
+    title,
+    description,
+    variant,
+    imageUrl,
+    uploading,
+  }: {
+    title: string;
+    description: string;
+    variant: "primary" | "light";
+    imageUrl: string;
+    uploading: boolean;
+  }) {
+    return (
+      <div className="rounded-xl border border-slate-200 p-4">
+        <div className="mb-3">
+          <h3 className="font-semibold text-[#0A1830]">{title}</h3>
+          <p className="mt-1 text-xs leading-5 text-slate-500">
+            {description}
+          </p>
+        </div>
+
+        <div
+          className={`flex min-h-36 items-center justify-center rounded-xl border border-dashed border-slate-300 p-5 ${
+            variant === "light" ? "bg-[#0A1830]" : "bg-slate-50"
+          }`}
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={`${title} preview`}
+              className="max-h-24 max-w-full object-contain"
+            />
+          ) : (
+            <div className="text-center">
+              <ImagePlus
+                size={30}
+                className={`mx-auto mb-2 ${
+                  variant === "light" ? "text-blue-200" : "text-slate-400"
+                }`}
+              />
+              <p
+                className={`text-sm ${
+                  variant === "light" ? "text-blue-100" : "text-slate-500"
+                }`}
+              >
+                No logo uploaded
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800">
+            {uploading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Upload size={16} />
+            )}
+            {uploading ? "Uploading..." : imageUrl ? "Replace Logo" : "Upload Logo"}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              disabled={uploading}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) {
+                  void uploadLogo(file, variant);
+                }
+                event.currentTarget.value = "";
+              }}
+            />
+          </label>
+
+          {imageUrl && (
+            <button
+              type="button"
+              onClick={() => removeLogo(variant)}
+              className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2.5 text-sm font-semibold text-red-600 hover:bg-red-50"
+            >
+              <X size={16} />
+              Remove
+            </button>
+          )}
+        </div>
+
+        <p className="mt-3 text-xs text-slate-400">
+          PNG, JPG or WebP · Maximum 5 MB
+        </p>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#F4F7FB]">
       <header className="bg-[#0A1830] px-5 py-5 text-white sm:px-8">
@@ -232,6 +423,42 @@ export default function WebsiteSettingsPage() {
           </div>
         ) : (
           <form onSubmit={saveSettings} className="space-y-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-5 flex items-center gap-3">
+                <ImagePlus className="text-blue-700" size={22} />
+                <div>
+                  <h2 className="font-bold text-[#0A1830]">Logo Management</h2>
+                  <p className="text-sm text-slate-500">
+                    Upload and manage the logos used across your website.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <LogoUploader
+                  title="Primary Logo"
+                  description="For light backgrounds, such as a white website header or footer."
+                  variant="primary"
+                  imageUrl={settings.logoUrl}
+                  uploading={uploadingPrimary}
+                />
+
+                <LogoUploader
+                  title="Light Logo"
+                  description="For dark backgrounds, such as your navy header or dark sections."
+                  variant="light"
+                  imageUrl={settings.logoLightUrl}
+                  uploading={uploadingLight}
+                />
+              </div>
+
+              <p className="mt-4 rounded-lg bg-blue-50 p-3 text-xs leading-5 text-blue-800">
+                Uploading a logo does not immediately publish it. Click
+                <strong> Save Settings </strong>
+                below to save your logo selection.
+              </p>
+            </section>
+
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-5 flex items-center gap-3">
                 <Globe className="text-blue-700" size={22} />
@@ -355,7 +582,7 @@ export default function WebsiteSettingsPage() {
                 <button
                   type="button"
                   onClick={loadSettings}
-                  disabled={loading || saving}
+                  disabled={loading || saving || uploadingPrimary || uploadingLight}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                 >
                   <RefreshCw size={17} />
@@ -364,7 +591,7 @@ export default function WebsiteSettingsPage() {
 
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || uploadingPrimary || uploadingLight}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:opacity-60"
                 >
                   {saving ? (
@@ -381,4 +608,4 @@ export default function WebsiteSettingsPage() {
       </div>
     </main>
   );
-    }
+          }
