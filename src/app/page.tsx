@@ -220,7 +220,7 @@ export default async function HomePage() {
             <Link href="/services">Services</Link>
             <Link href="/products">Products</Link>
             <Link href="/portfolio">Portfolio</Link>
-            <Link href="/#contact">Contact</Link>
+            <Link href="/contact">Contact</Link>
           </nav>
 
           <MobileMenu />
@@ -573,11 +573,11 @@ export default async function HomePage() {
 
           <div className="footer-links">
             <Link href="/#home">Home</Link>
-            <Link href="/#about">About</Link>
-            <Link href="/#services">Services</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
             <Link href="/products">Products</Link>
             <Link href="/portfolio">Portfolio</Link>
-            <Link href="/#contact">Contact</Link>
+            <Link href="/contact">Contact</Link>
           </div>
         </div>
 
