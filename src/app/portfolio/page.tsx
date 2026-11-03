@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -26,8 +25,17 @@ type PortfolioProject = {
   created_at: string;
 };
 
+type PortfolioLogos = {
+  logoUrl: string;
+  logoLightUrl: string;
+};
+
 export default function PortfolioPage() {
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
+  const [logos, setLogos] = useState<PortfolioLogos>({
+    logoUrl: "",
+    logoLightUrl: "",
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -52,6 +60,19 @@ export default function PortfolioPage() {
           setProjects(
             Array.isArray(result.projects) ? result.projects : []
           );
+
+          if (result.logos) {
+            setLogos({
+              logoUrl:
+                typeof result.logos.logoUrl === "string"
+                  ? result.logos.logoUrl
+                  : "",
+              logoLightUrl:
+                typeof result.logos.logoLightUrl === "string"
+                  ? result.logos.logoLightUrl
+                  : "",
+            });
+          }
         }
       } catch (err) {
         if (active) {
@@ -75,6 +96,46 @@ export default function PortfolioPage() {
 
   return (
     <main>
+      {/* HEADER */}
+      <header className="site-header">
+        <div className="container nav-container">
+          <Link
+            href="/"
+            className="brand"
+            aria-label="Adigun Telecom Home"
+          >
+            {logos.logoUrl ? (
+              <img
+                src={logos.logoUrl}
+                alt="Adigun Telecom"
+                className="h-12 w-auto max-w-[190px] object-contain"
+              />
+            ) : (
+              <>
+                <span className="brand-mark">A</span>
+                <span>
+                  <strong>ADIGUN</strong>
+                  <small>TELECOM</small>
+                </span>
+              </>
+            )}
+          </Link>
+
+          <nav className="desktop-nav">
+            <Link href="/#home">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/products">Products</Link>
+            <Link href="/portfolio">Portfolio</Link>
+            <Link href="/contact">Contact</Link>
+          </nav>
+
+          <Link href="/contact" className="nav-cta">
+            Let's Talk <ArrowRight size={16} />
+          </Link>
+        </div>
+      </header>
+
       {/* PORTFOLIO HERO */}
       <section
         className="section"
@@ -455,8 +516,7 @@ export default function PortfolioPage() {
           )}
         </div>
       </section>
-
-      {/* PROJECT ENQUIRY */}
+            {/* PROJECT ENQUIRY */}
       <section
         className="section"
         style={{
@@ -505,6 +565,56 @@ export default function PortfolioPage() {
           </Link>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="container footer-main">
+          <div>
+            <Link
+              href="/"
+              className="brand footer-brand"
+              aria-label="Adigun Telecom Home"
+            >
+              {logos.logoLightUrl || logos.logoUrl ? (
+                <img
+                  src={logos.logoLightUrl || logos.logoUrl}
+                  alt="Adigun Telecom"
+                  className="h-12 w-auto max-w-[190px] object-contain"
+                />
+              ) : (
+                <>
+                  <span className="brand-mark">A</span>
+                  <span>
+                    <strong>ADIGUN</strong>
+                    <small>TELECOM</small>
+                  </span>
+                </>
+              )}
+            </Link>
+
+            <p>Building Technology. Empowering Progress.</p>
+          </div>
+
+          <div className="footer-links">
+            <Link href="/#home">Home</Link>
+            <Link href="/about">About</Link>
+            <Link href="/services">Services</Link>
+            <Link href="/products">Products</Link>
+            <Link href="/portfolio">Portfolio</Link>
+            <Link href="/contact">Contact</Link>
+          </div>
+        </div>
+
+        <div className="container footer-bottom">
+          <span>
+            © {new Date().getFullYear()} Adigun Telecom.
+          </span>
+
+          <span>
+            Building a smarter digital future.
+          </span>
+        </div>
+      </footer>
     </main>
   );
 }
