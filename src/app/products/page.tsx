@@ -1,5 +1,5 @@
-
 import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import {
   ArrowRight,
   GraduationCap,
@@ -8,6 +8,13 @@ import {
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+type WebsiteLogoSettings = {
+  logoUrl?: string;
+  logoLightUrl?: string;
+};
 
 const products = [
   {
@@ -61,9 +68,147 @@ const products = [
   },
 ];
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  let logoUrl = "";
+  let logoLightUrl = "";
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("website_settings")
+      .select("settings")
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Products page logo settings error:", error);
+    } else if (data?.settings) {
+      const settings = data.settings as WebsiteLogoSettings;
+
+      logoUrl =
+        typeof settings.logoUrl === "string"
+          ? settings.logoUrl
+          : "";
+
+      logoLightUrl =
+        typeof settings.logoLightUrl === "string"
+          ? settings.logoLightUrl
+          : "";
+    }
+  } catch (error) {
+    console.error("Unable to load Products page logos:", error);
+  }
+
   return (
     <main>
+      {/* HEADER */}
+      <header
+        style={{
+          background: "#ffffff",
+          borderBottom: "1px solid #e5ebf3",
+          position: "relative",
+          zIndex: 20,
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            minHeight: "82px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "24px",
+            flexWrap: "wrap",
+            paddingTop: "12px",
+            paddingBottom: "12px",
+          }}
+        >
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Adigun Telecom"
+                style={{
+                  height: "52px",
+                  width: "auto",
+                  maxWidth: "190px",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <span
+                style={{
+                  color: "#0A1830",
+                  fontSize: "1.35rem",
+                  fontWeight: 900,
+                  letterSpacing: "-.5px",
+                }}
+              >
+                ADIGUN TELECOM
+              </span>
+            )}
+          </Link>
+
+          <nav
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "22px",
+              flexWrap: "wrap",
+              fontSize: ".9rem",
+              fontWeight: 700,
+            }}
+          >
+            <Link href="/" style={{ color: "#334155", textDecoration: "none" }}>
+              Home
+            </Link>
+
+            <Link href="/about" style={{ color: "#334155", textDecoration: "none" }}>
+              About
+            </Link>
+
+            <Link href="/services" style={{ color: "#334155", textDecoration: "none" }}>
+              Services
+            </Link>
+
+            <Link
+              href="/products"
+              style={{
+                color: "#2879D8",
+                textDecoration: "none",
+              }}
+            >
+              Products
+            </Link>
+
+            <Link href="/portfolio" style={{ color: "#334155", textDecoration: "none" }}>
+              Portfolio
+            </Link>
+
+            <Link
+              href="/#contact"
+              className="primary-button"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "11px 20px",
+              }}
+            >
+              Contact Us
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      {/* PRODUCTS HERO */}
       <section
         className="section"
         style={{ background: "#0A1830", color: "#fff" }}
@@ -111,6 +256,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
+      {/* PRODUCT LIST */}
       <section className="section">
         <div className="container">
           <span className="section-label">THE ADIGUN ECOSYSTEM</span>
@@ -140,7 +286,8 @@ export default function ProductsPage() {
                   key={product.number}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                    gridTemplateColumns:
+                      "repeat(auto-fit, minmax(260px, 1fr))",
                     border: "1px solid #e5ebf3",
                     borderRadius: "14px",
                     overflow: "hidden",
@@ -161,7 +308,11 @@ export default function ProductsPage() {
                       textAlign: "center",
                     }}
                   >
-                    <Icon size={65} color="#7dbbff" strokeWidth={1.5} />
+                    <Icon
+                      size={65}
+                      color="#7dbbff"
+                      strokeWidth={1.5}
+                    />
 
                     <span
                       style={{
@@ -282,7 +433,7 @@ export default function ProductsPage() {
           </div>
         </div>
       </section>
-
+            {/* FINAL CTA */}
       <section
         className="section"
         style={{
@@ -324,6 +475,175 @@ export default function ProductsPage() {
           </Link>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer
+        style={{
+          background: "#071426",
+          color: "#ffffff",
+          padding: "55px 0 22px",
+        }}
+      >
+        <div className="container">
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: "40px",
+              paddingBottom: "35px",
+            }}
+          >
+            <div>
+              <Link
+                href="/"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  textDecoration: "none",
+                }}
+              >
+                {logoLightUrl || logoUrl ? (
+                  <img
+                    src={logoLightUrl || logoUrl}
+                    alt="Adigun Telecom"
+                    style={{
+                      height: "52px",
+                      width: "auto",
+                      maxWidth: "190px",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  <span
+                    style={{
+                      color: "#ffffff",
+                      fontSize: "1.35rem",
+                      fontWeight: 900,
+                    }}
+                  >
+                    ADIGUN TELECOM
+                  </span>
+                )}
+              </Link>
+
+              <p
+                style={{
+                  color: "#aab8ca",
+                  lineHeight: 1.8,
+                  marginTop: "18px",
+                  maxWidth: "320px",
+                }}
+              >
+                Building Technology. Empowering Progress.
+                We create digital solutions that help businesses
+                and organisations move forward.
+              </p>
+            </div>
+
+            <div>
+              <h3
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 800,
+                  marginBottom: "18px",
+                }}
+              >
+                Quick Links
+              </h3>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "13px",
+                  fontSize: ".9rem",
+                }}
+              >
+                <Link href="/" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                  Home
+                </Link>
+
+                <Link href="/about" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                  About Us
+                </Link>
+
+                <Link href="/services" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                  Services
+                </Link>
+
+                <Link href="/products" style={{ color: "#7dbbff", textDecoration: "none" }}>
+                  Products
+                </Link>
+
+                <Link href="/portfolio" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                  Portfolio
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <h3
+                style={{
+                  fontSize: "1rem",
+                  fontWeight: 800,
+                  marginBottom: "18px",
+                }}
+              >
+                Contact
+              </h3>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "13px",
+                  color: "#aab8ca",
+                  fontSize: ".9rem",
+                  lineHeight: 1.7,
+                }}
+              >
+                <a
+                  href="mailto:adiguntelecoms@gmail.com"
+                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                >
+                  adiguntelecoms@gmail.com
+                </a>
+
+                <a
+                  href="tel:07042723692"
+                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                >
+                  07042723692
+                </a>
+
+                <a
+                  href="tel:09078440739"
+                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                >
+                  09078440739
+                </a>
+
+                <Link
+                  href="/#contact"
+                  style={{ color: "#7dbbff", textDecoration: "none", fontWeight: 700 }}
+                >
+                  Send an Enquiry <ArrowRight size={15} />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              borderTop: "1px solid rgba(255,255,255,.12)",
+              paddingTop: "20px",
+              textAlign: "center",
+              color: "#8798ad",
+              fontSize: ".82rem",
+            }}
+          >
+            © {new Date().getFullYear()} Adigun Telecom. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </main>
   );
-}
+                  }
