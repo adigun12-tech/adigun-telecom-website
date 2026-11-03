@@ -77,7 +77,7 @@ export default function MediaSlideshow({
 
   return (
     <div
-      className={`relative isolate aspect-[9/16] w-full overflow-hidden rounded-2xl border border-white/15 bg-[#0A1830] shadow-2xl ${className}`}
+      className={`relative isolate aspect-video w-full overflow-hidden rounded-2xl border border-white/15 bg-[#0A1830] shadow-2xl ${className}`}
       aria-roledescription="carousel"
       aria-label="Image slideshow"
     >
