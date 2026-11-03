@@ -20,6 +20,10 @@ const defaultSettings = {
   metaDescription:
     "Adigun Telecom builds innovative digital solutions for businesses, schools and organisations.",
   maintenanceMode: false,
+  logoUrl: "",
+  logoPath: "",
+  logoLightUrl: "",
+  logoLightPath: "",
 };
 
 export async function GET(request: Request) {
@@ -87,18 +91,43 @@ export async function PUT(request: Request) {
     const settings = Object.fromEntries(
       allowedKeys.map((key) => [
         key,
-        body.settings[key] ?? defaultSettings[key as keyof typeof defaultSettings],
+        body.settings[key] ??
+          defaultSettings[key as keyof typeof defaultSettings],
       ])
     );
 
-    if (
-      typeof settings.companyName !== "string" ||
-      typeof settings.email !== "string" ||
-      typeof settings.websiteTitle !== "string" ||
-      typeof settings.metaDescription !== "string"
-    ) {
+    const stringKeys = [
+      "companyName",
+      "slogan",
+      "email",
+      "phone1",
+      "phone2",
+      "whatsapp",
+      "address",
+      "facebook",
+      "instagram",
+      "linkedin",
+      "x",
+      "websiteTitle",
+      "metaDescription",
+      "logoUrl",
+      "logoPath",
+      "logoLightUrl",
+      "logoLightPath",
+    ] as const;
+
+    for (const key of stringKeys) {
+      if (typeof settings[key] !== "string") {
+        return NextResponse.json(
+          { error: `Invalid value for ${key}.` },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (typeof settings.maintenanceMode !== "boolean") {
       return NextResponse.json(
-        { error: "Some settings have invalid values." },
+        { error: "Invalid maintenance mode value." },
         { status: 400 }
       );
     }
@@ -145,4 +174,4 @@ export async function PUT(request: Request) {
       { status: 500 }
     );
   }
-}
+         }
