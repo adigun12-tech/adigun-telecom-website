@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -18,11 +17,8 @@ import {
   X,
   FolderOpen,
   ExternalLink,
-  Play,
-  Pause,
   ChevronUp,
   ChevronDown,
-  Settings2,
   Images,
   Eye,
 } from "lucide-react";
@@ -47,6 +43,7 @@ type SlideshowSettings = {
   transition: "fade" | "slide";
   showArrows: boolean;
   showDots: boolean;
+  imageFit: "contain" | "cover";
 };
 
 type MediaSlideshowSettings = {
@@ -62,6 +59,7 @@ const defaultSlideshowSettings: MediaSlideshowSettings = {
     transition: "fade",
     showArrows: true,
     showDots: true,
+    imageFit: "contain",
   },
   portfolio: {
     enabled: false,
@@ -70,6 +68,7 @@ const defaultSlideshowSettings: MediaSlideshowSettings = {
     transition: "slide",
     showArrows: true,
     showDots: true,
+    imageFit: "cover",
   },
 };
 
@@ -236,6 +235,7 @@ export default function MediaLibraryPage() {
             value.showDots !== undefined
               ? Boolean(value.showDots)
               : defaults.showDots,
+          imageFit: value.imageFit === "cover" ? "cover" : "contain",
         };
       };
 
@@ -496,9 +496,8 @@ export default function MediaLibraryPage() {
 
       if (!response.ok) {
         throw new Error(result.error || "Image upload failed.");
-      }
-
-      setSelectedFile(null);
+    }
+            setSelectedFile(null);
       setAltText("");
 
       if (fileInputRef.current) {
@@ -636,7 +635,7 @@ export default function MediaLibraryPage() {
         activeSlides.length,
     }));
   }
-  
+
   return (
     <main className="min-h-screen bg-[#F4F7FB]">
       <header className="bg-[#0A1830] px-5 py-5 text-white sm:px-8">
@@ -887,6 +886,38 @@ export default function MediaLibraryPage() {
                     </label>
                   </div>
 
+                  <div className="mt-4">
+                    <label className="block">
+                      <span className="mb-2 block text-xs font-semibold text-slate-600">
+                        Image display
+                      </span>
+
+                      <select
+                        value={activeSettings.imageFit}
+                        onChange={(event) =>
+                          updateSlideshow(activeSlideshow, {
+                            imageFit: event.target.value as
+                              | "contain"
+                              | "cover",
+                          })
+                        }
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"
+                      >
+                        <option value="contain">
+                          Fit — show the complete image
+                        </option>
+                        <option value="cover">
+                          Fill — cover the frame
+                        </option>
+                      </select>
+
+                      <span className="mt-2 block text-xs leading-5 text-slate-500">
+                        Fit avoids cropping. Fill covers the landscape frame
+                        but may crop parts of portrait or differently sized images.
+                      </span>
+                    </label>
+                  </div>
+
                   <div className="mt-4 flex flex-wrap gap-5 rounded-xl bg-slate-50 p-4">
                     <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
                       <input
@@ -916,8 +947,7 @@ export default function MediaLibraryPage() {
                       Show navigation dots
                     </label>
                   </div>
-
-                  <div className="mt-6">
+                                    <div className="mt-6">
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                       <h3 className="font-bold text-[#0A1830]">
                         Select Images
@@ -1010,7 +1040,11 @@ export default function MediaLibraryPage() {
                         <img
                           src={previewImage.file_url}
                           alt={previewImage.alt_text || previewImage.file_name}
-                          className="h-full w-full object-cover"
+                          className={`h-full w-full ${
+                            activeSettings.imageFit === "cover"
+                              ? "object-cover"
+                              : "object-contain"
+                          }`}
                         />
 
                         {activeSettings.showArrows &&
@@ -1107,7 +1141,7 @@ export default function MediaLibraryPage() {
                               alt={item.alt_text || item.file_name}
                               className="h-12 w-16 rounded-lg bg-slate-100 object-cover"
                             />
-                            
+
                             <p className="min-w-0 flex-1 truncate text-xs font-semibold text-[#0A1830]">
                               {item.file_name}
                             </p>
@@ -1466,5 +1500,4 @@ export default function MediaLibraryPage() {
       </div>
     </main>
   );
-          }
-                      
+}
