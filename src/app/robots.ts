@@ -1,3 +1,4 @@
+
 import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/"],
     },
-    sitemap: "https://adigun-telecom-website.vercel.app/sitemap.xml",
+    sitemap: "https://adiguntelecom.com.ng/sitemap.xml",
   };
 }
