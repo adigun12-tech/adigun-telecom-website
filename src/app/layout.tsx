@@ -11,6 +11,30 @@ const defaultTitle =
 const defaultDescription =
   "Adigun Telecom is an Africa-focused technology company providing software development, website design, education technology and digital business solutions.";
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Adigun Telecom",
+      url: SITE_URL,
+      description: defaultDescription,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "Adigun Telecom",
+      description: defaultDescription,
+      publisher: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+      inLanguage: "en-NG",
+    },
+  ],
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   let title = defaultTitle;
   let description = defaultDescription;
@@ -96,7 +120,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema).replace(
+              /</g,
+              "\\u003c"
+            ),
+          }}
+        />
+
+        {children}
+      </body>
     </html>
   );
 }
