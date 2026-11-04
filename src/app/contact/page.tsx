@@ -18,6 +18,16 @@ export const metadata: Metadata = {
   title: "Contact Us | Adigun Telecom",
   description:
     "Contact Adigun Telecom for software development, website design, education technology and digital business solutions. Let's discuss your project.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact Us | Adigun Telecom",
+    description:
+      "Contact Adigun Telecom for software development, website design, education technology and digital business solutions. Let's discuss your project.",
+    url: "https://adiguntelecom.com.ng/contact",
+    type: "website",
+  },
 };
 
 export const dynamic = "force-dynamic";
