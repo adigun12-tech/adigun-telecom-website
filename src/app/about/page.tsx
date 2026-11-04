@@ -9,6 +9,13 @@ import {
   Award,
   Users,
 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us | Adigun Telecom",
+  description:
+    "Learn about Adigun Telecom, our mission, values and commitment to building innovative technology solutions that empower businesses and organisations.",
+};
 
 export const dynamic = "force-dynamic";
 
