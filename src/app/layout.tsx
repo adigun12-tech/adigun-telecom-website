@@ -11,34 +11,24 @@ const defaultTitle =
 const defaultDescription =
   "Adigun Telecom is an Africa-focused technology company providing software development, website design, education technology and digital business solutions.";
 
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: "Adigun Telecom",
-      url: SITE_URL,
-      description: defaultDescription,
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}/#website`,
-      url: SITE_URL,
-      name: "Adigun Telecom",
-      description: defaultDescription,
-      publisher: {
-        "@id": `${SITE_URL}/#organization`,
-      },
-      inLanguage: "en-NG",
-    },
-  ],
+type WebsiteSettings = {
+  companyName?: string;
+  slogan?: string;
+  email?: string;
+  phone1?: string;
+  phone2?: string;
+  whatsapp?: string;
+  address?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  x?: string;
+  websiteTitle?: string;
+  metaDescription?: string;
+  logoUrl?: string;
 };
 
-export async function generateMetadata(): Promise<Metadata> {
-  let title = defaultTitle;
-  let description = defaultDescription;
-
+async function getWebsiteSettings(): Promise<WebsiteSettings> {
   try {
     const { data, error } = await supabaseAdmin
       .from("website_settings")
@@ -47,24 +37,23 @@ export async function generateMetadata(): Promise<Metadata> {
       .maybeSingle();
 
     if (error) {
-      console.error("SEO metadata settings error:", error);
-    } else if (data?.settings) {
-      const settings = data.settings as {
-        websiteTitle?: string;
-        metaDescription?: string;
-      };
-
-      if (settings.websiteTitle?.trim()) {
-        title = settings.websiteTitle.trim();
-      }
-
-      if (settings.metaDescription?.trim()) {
-        description = settings.metaDescription.trim();
-      }
+      console.error("Website settings error:", error);
+      return {};
     }
+
+    return (data?.settings || {}) as WebsiteSettings;
   } catch (error) {
-    console.error("Unable to load SEO metadata:", error);
+    console.error("Unable to load website settings:", error);
+    return {};
   }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getWebsiteSettings();
+
+  const title = settings.websiteTitle?.trim() || defaultTitle;
+  const description =
+    settings.metaDescription?.trim() || defaultDescription;
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -98,12 +87,25 @@ export async function generateMetadata(): Promise<Metadata> {
       url: SITE_URL,
       type: "website",
       locale: "en_NG",
+      ...(settings.logoUrl?.trim()
+        ? {
+            images: [
+              {
+                url: settings.logoUrl.trim(),
+                alt: "Adigun Telecom Logo",
+              },
+            ],
+          }
+        : {}),
     },
 
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      ...(settings.logoUrl?.trim()
+        ? { images: [settings.logoUrl.trim()] }
+        : {}),
     },
 
     robots: {
@@ -113,11 +115,78 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getWebsiteSettings();
+
+  const socialProfiles = [
+    settings.facebook,
+    settings.instagram,
+    settings.linkedin,
+    settings.x,
+  ].filter(
+    (url): url is string =>
+      typeof url === "string" && /^https?:\/\//i.test(url.trim())
+  ).map((url) => url.trim());
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: settings.companyName?.trim() || "Adigun Telecom",
+        url: SITE_URL,
+        description:
+          settings.metaDescription?.trim() || defaultDescription,
+        ...(settings.slogan?.trim()
+          ? { slogan: settings.slogan.trim() }
+          : {}),
+        ...(settings.logoUrl?.trim()
+          ? {
+              logo: {
+                "@type": "ImageObject",
+                url: settings.logoUrl.trim(),
+              },
+            }
+          : {}),
+        ...(settings.email?.trim()
+          ? { email: settings.email.trim() }
+          : {}),
+        ...(settings.phone1?.trim()
+          ? { telephone: settings.phone1.trim() }
+          : {}),
+        ...(settings.address?.trim()
+          ? {
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: settings.address.trim(),
+                addressCountry: "NG",
+              },
+            }
+          : {}),
+        ...(socialProfiles.length > 0
+          ? { sameAs: socialProfiles }
+          : {}),
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: settings.companyName?.trim() || "Adigun Telecom",
+        description:
+          settings.metaDescription?.trim() || defaultDescription,
+        publisher: {
+          "@id": `${SITE_URL}/#organization`,
+        },
+        inLanguage: "en-NG",
+      },
+    ],
+  };
+
   return (
     <html lang="en">
       <body>
