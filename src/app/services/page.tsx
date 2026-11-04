@@ -10,6 +10,13 @@ import {
   Lightbulb,
   CheckCircle2,
 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Our Services | Adigun Telecom",
+  description:
+    "Explore Adigun Telecom services, including custom software development, website design, education technology, digital solutions and business automation.",
+};
 
 export const dynamic = "force-dynamic";
 
