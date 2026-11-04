@@ -1,14 +1,12 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
   ExternalLink,
   FolderKanban,
-  Loader2,
   CheckCircle2,
   Images,
 } from "lucide-react";
@@ -35,122 +33,14 @@ type PortfolioProject = {
   portfolio_project_images?: PortfolioImage[];
 };
 
-export default function PortfolioProjectPage() {
-  const params = useParams<{ slug: string }>();
-  const slug = params.slug;
+type PortfolioProjectClientProps = {
+  initialProject: PortfolioProject;
+};
 
-  const [project, setProject] =
-    useState<PortfolioProject | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadProject() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const response = await fetch(
-          `/api/portfolio?slug=${encodeURIComponent(slug)}`,
-          { cache: "no-store" }
-        );
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            result.error || "Unable to load this project."
-          );
-        }
-
-        if (active) {
-          setProject(result.project || null);
-        }
-      } catch (err) {
-        if (active) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "Something went wrong."
-          );
-        }
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    if (slug) loadProject();
-
-    return () => {
-      active = false;
-    };
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <main
-        style={{
-          minHeight: "65vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "12px",
-          color: "#64748b",
-        }}
-      >
-        <Loader2 size={25} className="animate-spin" />
-        Loading project...
-      </main>
-    );
-  }
-
-  if (error || !project) {
-    return (
-      <main
-        className="section"
-        style={{ minHeight: "65vh", textAlign: "center" }}
-      >
-        <div className="container">
-          <FolderKanban
-            size={55}
-            color="#2879D8"
-            style={{ margin: "0 auto 20px" }}
-          />
-
-          <h1
-            style={{
-              color: "#0A1830",
-              fontSize: "2rem",
-              fontWeight: 800,
-            }}
-          >
-            Project Not Found
-          </h1>
-
-          <p style={{ color: "#64748b", marginTop: "12px" }}>
-            {error ||
-              "This project may have been removed or unpublished."}
-          </p>
-
-          <Link
-            href="/portfolio"
-            className="primary-button"
-            style={{
-              display: "inline-flex",
-              marginTop: "25px",
-              alignItems: "center",
-              gap: "9px",
-            }}
-          >
-            <ArrowLeft size={18} />
-            Back to Portfolio
-          </Link>
-        </div>
-      </main>
-    );
-  }
+export default function PortfolioProjectClient({
+  initialProject,
+}: PortfolioProjectClientProps) {
+  const project = initialProject;
 
   const galleryImages = [
     ...(project.portfolio_project_images || []),
@@ -353,7 +243,8 @@ export default function PortfolioProjectPage() {
               </div>
             </div>
           )}
-                    {/* PROJECT OVERVIEW AND INFORMATION */}
+
+          {/* PROJECT OVERVIEW AND INFORMATION */}
           <div
             style={{
               display: "grid",
@@ -561,4 +452,4 @@ export default function PortfolioProjectPage() {
       </section>
     </main>
   );
-                  }
+}
