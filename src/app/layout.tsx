@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
 import "./globals.css";
 
+const SITE_URL = "https://adiguntelecom.com.ng";
+
 const defaultTitle =
   "Adigun Telecom | Building Technology. Empowering Progress.";
 
@@ -41,12 +43,17 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   return {
+    metadataBase: new URL(SITE_URL),
+
     title: {
       default: title,
       template: "%s | Adigun Telecom",
     },
+
     description,
+
     applicationName: "Adigun Telecom",
+
     keywords: [
       "Adigun Telecom",
       "Technology Company in Nigeria",
@@ -55,17 +62,26 @@ export async function generateMetadata(): Promise<Metadata> {
       "Education Technology",
       "Digital Solutions",
     ],
+
+    alternates: {
+      canonical: "/",
+    },
+
     openGraph: {
       title,
       description,
       siteName: "Adigun Telecom",
+      url: SITE_URL,
       type: "website",
+      locale: "en_NG",
     },
+
     twitter: {
       card: "summary_large_image",
       title,
       description,
     },
+
     robots: {
       index: true,
       follow: true,
