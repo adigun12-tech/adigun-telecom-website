@@ -9,6 +9,13 @@ import {
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Our Products | Adigun Telecom",
+  description:
+    "Discover Adigun Telecom digital products, including Adigun SchoolSuite and technology solutions designed to improve business and educational operations.",
+};
 
 export const dynamic = "force-dynamic";
 
