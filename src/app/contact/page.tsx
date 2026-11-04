@@ -12,6 +12,13 @@ import {
   Globe,
   Headphones,
 } from "lucide-react";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us | Adigun Telecom",
+  description:
+    "Contact Adigun Telecom for software development, website design, education technology and digital business solutions. Let's discuss your project.",
+};
 
 export const dynamic = "force-dynamic";
 
