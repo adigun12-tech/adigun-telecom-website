@@ -11,11 +11,23 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 
+
 export const metadata: Metadata = {
   title: "About Us | Adigun Telecom",
   description:
     "Learn about Adigun Telecom, our mission, values and commitment to building innovative technology solutions that empower businesses and organisations.",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About Us | Adigun Telecom",
+    description:
+      "Learn about Adigun Telecom, our mission, values and commitment to building innovative technology solutions that empower businesses and organisations.",
+    url: "https://adiguntelecom.com.ng/about",
+    type: "website",
+  },
 };
+
 
 export const dynamic = "force-dynamic";
 
