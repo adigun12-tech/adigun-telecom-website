@@ -9,7 +9,14 @@ export const dynamic = "force-dynamic";
 
 const SITE_URL = "https://adiguntelecom.com.ng";
 
-type PortfolioProject = {
+export type PortfolioImage = {
+  id: string;
+  image_url: string;
+  alt_text: string | null;
+  display_order: number;
+};
+
+export type PortfolioProject = {
   id: string;
   title: string;
   slug: string;
@@ -21,15 +28,16 @@ type PortfolioProject = {
   live_url: string | null;
   completion_status: "in_progress" | "completed";
   created_at: string;
-  portfolio_project_images?: {
-    id: string;
-    image_url: string;
-    alt_text: string | null;
-    display_order: number;
-  }[];
+  portfolio_project_images?: PortfolioImage[];
 };
 
-async function getProject(slug: string) {
+type PageProps = {
+  params: Promise<{ slug: string }>;
+};
+
+async function getProject(
+  slug: string
+): Promise<PortfolioProject | null> {
   const { data, error } = await supabaseAdmin
     .from("portfolio_projects")
     .select(`
@@ -60,26 +68,25 @@ async function getProject(slug: string) {
     throw new Error("Unable to load portfolio project.");
   }
 
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
 
-  const project = data as PortfolioProject;
+  const project = data as unknown as PortfolioProject;
 
   project.portfolio_project_images = [
     ...(project.portfolio_project_images || []),
-  ].sort((a, b) => a.display_order - b.display_order);
+  ].sort(
+    (a, b) => a.display_order - b.display_order
+  );
 
   return project;
 }
-
-type PageProps = {
-  params: Promise<{ slug: string }>;
-};
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-
   const project = await getProject(slug);
 
   if (!project) {
@@ -96,33 +103,38 @@ export async function generateMetadata({
 
   const description =
     project.short_description ||
-    project.description?.slice(0, 155) ||
+    project.description?.replace(/\s+/g, " ").slice(0, 155) ||
     `Explore the ${project.title} project by Adigun Telecom.`;
 
   const canonicalUrl =
     `${SITE_URL}/portfolio/${encodeURIComponent(project.slug)}`;
 
+  const openGraphImages = project.cover_image
+    ? [
+        {
+          url: project.cover_image,
+          alt: project.title,
+        },
+      ]
+    : [];
+
   return {
     title,
     description,
+
     alternates: {
       canonical: canonicalUrl,
     },
+
     openGraph: {
       type: "article",
       url: canonicalUrl,
       siteName: "Adigun Telecom",
       title,
       description,
-      images: project.cover_image
-        ? [
-            {
-              url: project.cover_image,
-              alt: project.title,
-            },
-          ]
-        : [],
+      images: openGraphImages,
     },
+
     twitter: {
       card: project.cover_image
         ? "summary_large_image"
@@ -140,12 +152,13 @@ export default async function PortfolioProjectPage({
   params,
 }: PageProps) {
   const { slug } = await params;
-
   const project = await getProject(slug);
 
   if (!project) {
     notFound();
   }
 
-  return <PortfolioProjectClient initialProject={project} />;
-      }
+  return (
+    <PortfolioProjectClient initialProject={project} />
+  );
+}
