@@ -157,7 +157,7 @@ export default async function PortfolioProjectPage({
   if (!project) {
     notFound();
   }
-
+  
   return (
     <PortfolioProjectClient initialProject={project} />
   );
