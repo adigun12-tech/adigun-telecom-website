@@ -36,22 +36,24 @@ type WebsiteLogoSettings = {
 
 const products = [
   {
-    number: "01",
-    icon: GraduationCap,
-    name: "Adigun SchoolSuite",
-    category: "EDUCATION TECHNOLOGY",
-    status: "Flagship Product",
-    description:
-      "A modern school management platform designed to simplify academic administration, improve communication and connect schools, teachers, parents and students.",
-    features: [
-      "Student and staff management",
-      "Attendance and academic records",
-      "Digital report cards",
-      "Parent and student portals",
-      "School administration tools",
-    ],
-    href: "/#contact",
-  },
+  number: "01",
+  icon: GraduationCap,
+  name: "Adigun SchoolSuite",
+  category: "EDUCATION TECHNOLOGY",
+  status: "Now Available",
+  description:
+    "A modern school management platform designed to simplify school administration, manage students and teachers, organise academic records, generate digital report cards and connect parents with their children's education.",
+  features: [
+    "Student and staff management",
+    "Attendance and academic records",
+    "Digital results and report cards",
+    "Parent and student portals",
+    "School administration dashboard",
+  ],
+  href: "https://schools.adiguntelecom.com.ng/",
+  previewImage: "/schoolsuite-preview.png",
+  external: true,
+},
   {
     number: "02",
     icon: Building2,
@@ -343,40 +345,40 @@ export default async function ProductsPage() {
                         marginTop: "22px",
                       }}
                     >
-                      {product.features.map((feature) => (
-                        <div
-                          key={feature}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px",
-                            color: "#334155",
-                            fontSize: ".88rem",
-                          }}
-                        >
-                          <CheckCircle2
-                            size={17}
-                            color="#2879D8"
-                            style={{ flexShrink: 0 }}
-                          />
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-
-                    <Link
-                      href={product.href}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "9px",
-                        color: "#2879D8",
-                        fontWeight: 800,
-                        marginTop: "27px",
-                      }}
-                    >
-                      Make an Enquiry <ArrowRight size={18} />
-                    </Link>
+ {product.external ? (
+  <a
+    href={product.href}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "9px",
+      color: "#2879D8",
+      fontWeight: 800,
+      marginTop: "27px",
+      textDecoration: "none",
+    }}
+  >
+    Visit SchoolSuite
+    <ArrowRight size={18} />
+  </a>
+) : (
+  <Link
+    href={product.href}
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "9px",
+      color: "#2879D8",
+      fontWeight: 800,
+      marginTop: "27px",
+    }}
+  >
+    Make an Enquiry
+    <ArrowRight size={18} />
+  </Link>
+)}
                   </div>
                 </article>
               );
