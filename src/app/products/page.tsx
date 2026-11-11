@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import MobileMenu from "@/components/MobileMenu";
 import { supabaseAdmin } from "@/lib/supabase-server-admin";
@@ -10,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { Metadata } from "next";
+import type { LucideIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Our Products | Adigun Telecom",
@@ -34,26 +36,39 @@ type WebsiteLogoSettings = {
   logoLightUrl?: string;
 };
 
-const products = [
+type Product = {
+  number: string;
+  icon: LucideIcon;
+  name: string;
+  category: string;
+  status: string;
+  description: string;
+  features: string[];
+  href: string;
+  external?: boolean;
+  previewImage?: string;
+};
+
+const products: Product[] = [
   {
-  number: "01",
-  icon: GraduationCap,
-  name: "Adigun SchoolSuite",
-  category: "EDUCATION TECHNOLOGY",
-  status: "Now Available",
-  description:
-    "A modern school management platform designed to simplify school administration, manage students and teachers, organise academic records, generate digital report cards and connect parents with their children's education.",
-  features: [
-    "Student and staff management",
-    "Attendance and academic records",
-    "Digital results and report cards",
-    "Parent and student portals",
-    "School administration dashboard",
-  ],
-  href: "https://schools.adiguntelecom.com.ng/",
-  previewImage: "/schoolsuite-preview.png",
-  external: true,
-},
+    number: "01",
+    icon: GraduationCap,
+    name: "Adigun SchoolSuite",
+    category: "EDUCATION TECHNOLOGY",
+    status: "Now Available",
+    description:
+      "A modern school management platform designed to simplify school administration, manage students and teachers, organise academic records, generate digital report cards and connect parents with their children's education.",
+    features: [
+      "Student and staff management",
+      "Attendance and academic records",
+      "Digital results and report cards",
+      "Parent and student portals",
+      "School administration dashboard",
+    ],
+    href: "https://schools.adiguntelecom.com.ng/",
+    previewImage: "/schoolsuite-preview.png",
+    external: true,
+  },
   {
     number: "02",
     icon: Building2,
@@ -120,7 +135,7 @@ export default async function ProductsPage() {
 
   return (
     <main>
-      {/* PREMIUM RESPONSIVE HEADER */}
+      {/* HEADER */}
       <header className="site-header">
         <div className="container nav-container">
           <Link
@@ -164,13 +179,21 @@ export default async function ProductsPage() {
       {/* PRODUCTS HERO */}
       <section
         className="section"
-        style={{ background: "#0A1830", color: "#fff" }}
+        style={{
+          background: "#0A1830",
+          color: "#fff",
+        }}
       >
         <div
           className="container"
-          style={{ paddingTop: "70px", paddingBottom: "70px" }}
+          style={{
+            paddingTop: "70px",
+            paddingBottom: "70px",
+          }}
         >
-          <span className="section-label">OUR PRODUCTS</span>
+          <span className="section-label">
+            OUR PRODUCTS
+          </span>
 
           <h1
             style={{
@@ -202,9 +225,13 @@ export default async function ProductsPage() {
           <Link
             href="/#contact"
             className="primary-button"
-            style={{ marginTop: "30px", display: "inline-flex" }}
+            style={{
+              marginTop: "30px",
+              display: "inline-flex",
+            }}
           >
-            Discuss a Product <ArrowRight size={18} />
+            Discuss a Product
+            <ArrowRight size={18} />
           </Link>
         </div>
       </section>
@@ -212,7 +239,9 @@ export default async function ProductsPage() {
       {/* PRODUCT LIST */}
       <section className="section">
         <div className="container">
-          <span className="section-label">THE ADIGUN ECOSYSTEM</span>
+          <span className="section-label">
+            THE ADIGUN ECOSYSTEM
+          </span>
 
           <h2 className="section-title">
             Digital Solutions Built for Real Needs.
@@ -245,52 +274,134 @@ export default async function ProductsPage() {
                     borderRadius: "14px",
                     overflow: "hidden",
                     background: "#fff",
+                    boxShadow: "0 8px 28px rgba(10,24,48,0.04)",
                   }}
                 >
+                  {/* PRODUCT PREVIEW */}
                   <div
                     style={{
+                      position: "relative",
                       background:
                         "radial-gradient(circle at 80% 20%, rgba(40,121,216,.35), transparent 45%), #0A1830",
-                      minHeight: "260px",
+                      minHeight: "300px",
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "center",
                       alignItems: "center",
-                      padding: "35px",
+                      padding: product.previewImage ? "0" : "35px",
                       color: "#fff",
                       textAlign: "center",
+                      overflow: "hidden",
                     }}
                   >
-                    <Icon
-                      size={65}
-                      color="#7dbbff"
-                      strokeWidth={1.5}
-                    />
+                    {product.previewImage ? (
+                      <>
+                        <img
+                          src={product.previewImage}
+                          alt="Adigun SchoolSuite homepage and dashboard preview"
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            objectPosition: "center 25%",
+                          }}
+                        />
 
-                    <span
-                      style={{
-                        marginTop: "24px",
-                        fontSize: ".72rem",
-                        letterSpacing: "2px",
-                        color: "#a9c9f1",
-                        fontWeight: 800,
-                      }}
-                    >
-                      ADIGUN TELECOM
-                    </span>
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            background:
+                              "linear-gradient(to top, rgba(4,13,34,.9), rgba(4,13,34,.05) 65%)",
+                          }}
+                        />
 
-                    <span
-                      style={{
-                        fontSize: "2rem",
-                        fontWeight: 800,
-                        marginTop: "8px",
-                      }}
-                    >
-                      {product.number}
-                    </span>
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "25px",
+                            left: "20px",
+                            right: "20px",
+                            zIndex: 1,
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "7px 13px",
+                              borderRadius: "30px",
+                              background: "#2879D8",
+                              color: "#fff",
+                              fontSize: ".7rem",
+                              fontWeight: 800,
+                              letterSpacing: "1px",
+                            }}
+                          >
+                            LIVE SCHOOL MANAGEMENT PLATFORM
+                          </span>
+
+                          <h3
+                            style={{
+                              fontSize: "1.65rem",
+                              fontWeight: 900,
+                              marginTop: "12px",
+                            }}
+                          >
+                            Adigun SchoolSuite
+                          </h3>
+
+                          <p
+                            style={{
+                              color: "#d5e5fa",
+                              fontSize: ".85rem",
+                              marginTop: "5px",
+                            }}
+                          >
+                            Smarter School Management
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Icon
+                          size={65}
+                          color="#7dbbff"
+                          strokeWidth={1.5}
+                        />
+
+                        <span
+                          style={{
+                            marginTop: "24px",
+                            fontSize: ".72rem",
+                            letterSpacing: "2px",
+                            color: "#a9c9f1",
+                            fontWeight: 800,
+                          }}
+                        >
+                          ADIGUN TELECOM
+                        </span>
+
+                        <span
+                          style={{
+                            fontSize: "2rem",
+                            fontWeight: 800,
+                            marginTop: "8px",
+                          }}
+                        >
+                          {product.number}
+                        </span>
+                      </>
+                    )}
                   </div>
 
-                  <div style={{ padding: "35px" }}>
+                  {/* PRODUCT DETAILS */}
+                  <div
+                    style={{
+                      padding: "35px",
+                    }}
+                  >
                     <span
                       style={{
                         color: "#2879D8",
@@ -338,6 +449,7 @@ export default async function ProductsPage() {
                       {product.description}
                     </p>
 
+                    {/* PRODUCT FEATURES */}
                     <div
                       style={{
                         display: "grid",
@@ -345,40 +457,63 @@ export default async function ProductsPage() {
                         marginTop: "22px",
                       }}
                     >
- {product.external ? (
-  <a
-    href={product.href}
-    target="_blank"
-    rel="noopener noreferrer"
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "9px",
-      color: "#2879D8",
-      fontWeight: 800,
-      marginTop: "27px",
-      textDecoration: "none",
-    }}
-  >
-    Visit SchoolSuite
-    <ArrowRight size={18} />
-  </a>
-) : (
-  <Link
-    href={product.href}
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "9px",
-      color: "#2879D8",
-      fontWeight: 800,
-      marginTop: "27px",
-    }}
-  >
-    Make an Enquiry
-    <ArrowRight size={18} />
-  </Link>
-)}
+                      {product.features.map((feature) => (
+                        <div
+                          key={feature}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            color: "#334155",
+                            fontSize: ".9rem",
+                          }}
+                        >
+                          <CheckCircle2
+                            size={17}
+                            color="#2879D8"
+                            style={{ flexShrink: 0 }}
+                          />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* PRODUCT ACTION */}
+                    {product.external ? (
+                      <a
+                        href={product.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "9px",
+                          color: "#2879D8",
+                          fontWeight: 800,
+                          marginTop: "27px",
+                          textDecoration: "none",
+                        }}
+                      >
+                        Visit SchoolSuite
+                        <ArrowRight size={18} />
+                      </a>
+                    ) : (
+                      <Link
+                        href={product.href}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "9px",
+                          color: "#2879D8",
+                          fontWeight: 800,
+                          marginTop: "27px",
+                          textDecoration: "none",
+                        }}
+                      >
+                        Make an Enquiry
+                        <ArrowRight size={18} />
+                      </Link>
+                    )}
                   </div>
                 </article>
               );
@@ -386,7 +521,8 @@ export default async function ProductsPage() {
           </div>
         </div>
       </section>
-            {/* FINAL CTA */}
+
+      {/* FINAL CTA */}
       <section
         className="section"
         style={{
@@ -395,7 +531,10 @@ export default async function ProductsPage() {
         }}
       >
         <div className="container">
-          <Sparkles size={35} color="#2879D8" />
+          <Sparkles
+            size={35}
+            color="#2879D8"
+          />
 
           <h2
             style={{
@@ -422,9 +561,13 @@ export default async function ProductsPage() {
           <Link
             href="/#contact"
             className="primary-button"
-            style={{ marginTop: "28px", display: "inline-flex" }}
+            style={{
+              marginTop: "28px",
+              display: "inline-flex",
+            }}
           >
-            Talk to Our Team <ArrowRight size={18} />
+            Talk to Our Team
+            <ArrowRight size={18} />
           </Link>
         </div>
       </section>
@@ -441,11 +584,13 @@ export default async function ProductsPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(220px, 1fr))",
               gap: "40px",
               paddingBottom: "35px",
             }}
           >
+            {/* FOOTER BRAND */}
             <div>
               <Link
                 href="/"
@@ -493,6 +638,7 @@ export default async function ProductsPage() {
               </p>
             </div>
 
+            {/* QUICK LINKS */}
             <div>
               <h3
                 style={{
@@ -511,28 +657,59 @@ export default async function ProductsPage() {
                   fontSize: ".9rem",
                 }}
               >
-                <Link href="/" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                <Link
+                                    href="/"
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
+                >
                   Home
                 </Link>
 
-                <Link href="/about" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                <Link
+                  href="/about"
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
+                >
                   About Us
                 </Link>
 
-                <Link href="/services" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                <Link
+                  href="/services"
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
+                >
                   Services
                 </Link>
 
-                <Link href="/products" style={{ color: "#7dbbff", textDecoration: "none" }}>
+                <Link
+                  href="/products"
+                  style={{
+                    color: "#7dbbff",
+                    textDecoration: "none",
+                  }}
+                >
                   Products
                 </Link>
 
-                <Link href="/portfolio" style={{ color: "#aab8ca", textDecoration: "none" }}>
+                <Link
+                  href="/portfolio"
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
+                >
                   Portfolio
                 </Link>
               </div>
             </div>
 
+            {/* CONTACT */}
             <div>
               <h3
                 style={{
@@ -555,21 +732,30 @@ export default async function ProductsPage() {
               >
                 <a
                   href="mailto:adiguntelecoms@gmail.com"
-                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
                 >
                   adiguntelecoms@gmail.com
                 </a>
 
                 <a
                   href="tel:07042723692"
-                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
                 >
                   07042723692
                 </a>
 
                 <a
                   href="tel:09078440739"
-                  style={{ color: "#aab8ca", textDecoration: "none" }}
+                  style={{
+                    color: "#aab8ca",
+                    textDecoration: "none",
+                  }}
                 >
                   09078440739
                 </a>
@@ -582,12 +768,21 @@ export default async function ProductsPage() {
                     fontWeight: 700,
                   }}
                 >
-                  Send an Enquiry <ArrowRight size={15} />
+                  Send an Enquiry
+                  <ArrowRight
+                    size={15}
+                    style={{
+                      display: "inline",
+                      verticalAlign: "middle",
+                      marginLeft: "5px",
+                    }}
+                  />
                 </Link>
               </div>
             </div>
           </div>
 
+          {/* COPYRIGHT */}
           <div
             style={{
               borderTop: "1px solid rgba(255,255,255,.12)",
@@ -597,10 +792,12 @@ export default async function ProductsPage() {
               fontSize: ".82rem",
             }}
           >
-            © {new Date().getFullYear()} Adigun Telecom. All rights reserved.
+            © {new Date().getFullYear()} Adigun Telecom.
+            All rights reserved.
           </div>
         </div>
       </footer>
     </main>
   );
-          }
+}
+ 
